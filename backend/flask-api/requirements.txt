@@ -1,0 +1,6 @@
+Flask
+tensorflow
+Pillow
+requests
+google-generativeai
+python-dotenv
