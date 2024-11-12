@@ -30,7 +30,7 @@ def predict():
     class_name = top_prediction['class']
     food_name = " ".join([word.capitalize() for word in class_name.split('_')])
 
-    if confidence < 0.88:
+    if confidence < 0:
         model_name = "gemini-1.5-flash"
         gemini_result = get_gemini_prediction(model_name, image)
         
@@ -63,8 +63,15 @@ def predict():
     nutrition_info_model = get_nutrition_info(food_name)
 
     # Lấy lượng calo và đơn vị đo lường
-    calories = nutrition_info_model.get("nf_calories", "N/A")
-    serving_weight = next((item["serving_weight"] for item in nutrition_info_model.get("alt_measures", []) if item["measure"] == "g" and item["qty"] == 100), "N/A")
+    # calories = nutrition_info_model.get("nf_calories", "N/A")
+    # serving_weight = next((item["serving_weight"] for item in nutrition_info_model.get("alt_measures", []) if item["measure"] == "g" and item["qty"] == 100), "N/A")
+
+    # food_name = nutrition_info_model["Predictions"]["predictions_model"]["name"]
+    # calories = nutrition_info_model["Predictions"]["predictions_model"]["nutrition_info"]["nf_calories"]
+    # protein = nutrition_info_model["Predictions"]["predictions_model"]["nutrition_info"]["nf_protein"]
+    # total_fat = nutrition_info_model["Predictions"]["predictions_model"]["nutrition_info"]["nf_total_fat"]
+    # carbohydrate = nutrition_info_model["Predictions"]["predictions_model"]["nutrition_info"]["nf_total_carbohydrate"]
+    # highres_image_url = nutrition_info_model["Predictions"]["predictions_model"]["nutrition_info"]["photo"]["highres"]
 
     return jsonify({
         'predictions_model': {
@@ -72,8 +79,8 @@ def predict():
             'score': top_prediction['score'],
             'name': food_name,
             'nutrition_info': nutrition_info_model,
-            'calories': calories,
-            'serving_weight': serving_weight,
-            'food_name_match': find_closest_food_name(food_name, nutrition_info_model["food_name"]),
+            # 'calories': calories,
+            # 'serving_weight': serving_weight,
+            'food_name_match': find_closest_food_name(food_name, nutrition_info_model["name"]),
         }
     })

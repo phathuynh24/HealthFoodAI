@@ -1,7 +1,6 @@
 import os
 import requests
 from dotenv import load_dotenv
-from flask import jsonify
 
 # Load biến môi trường từ .env
 load_dotenv()
@@ -24,7 +23,26 @@ def get_nutrition_info(food_name):
     response = requests.post(url, headers=headers, json=data)
     
     if response.status_code == 200:
-        nutrition_data = response.json()
-        return nutrition_data['foods'][0]  # Lấy thông tin dinh dưỡng của món ăn đầu tiên
+        nutrition_data = response.json()["foods"][0]  # Toàn bộ dữ liệu trả về từ Nutritionix
+
+        # Lọc các thông tin cần thiết từ nutrition_info
+        filtered_data = {
+            "name": nutrition_data.get("food_name", "N/A"),
+            "calories": nutrition_data.get("nf_calories", "N/A"),
+            "protein": nutrition_data.get("nf_protein", "N/A"),
+            "total_fat": nutrition_data.get("nf_total_fat", "N/A"),
+            "total_carbohydrate": nutrition_data.get("nf_total_carbohydrate", "N/A"),
+            "serving_qty": nutrition_data.get("serving_qty", "N/A"),
+            "serving_unit": nutrition_data.get("serving_unit", "N/A"),
+            "serving_weight_grams": nutrition_data.get("serving_weight_grams", "N/A"),
+            "highres_image_url": nutrition_data.get("photo", {}).get("highres", "N/A"),
+            # "full_nutrients": nutrition_data.get("full_nutrients", [])
+        }
+
+        # print(filtered_data)
+
+        return filtered_data
     else:
         return {"error": "Unable to fetch nutrition information"}
+
+# get_nutrition_info("Pho")
