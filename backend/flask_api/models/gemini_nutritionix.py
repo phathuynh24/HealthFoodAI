@@ -79,6 +79,12 @@ def calculate_total_nutrition(ingredients):
         else:
             print(f"Không thể lấy dữ liệu cho {ingredient['name']}")
 
+    # Làm tròn giá trị tổng dinh dưỡng
+    total_nutrition["calories"] = round(total_nutrition["calories"], 1)
+    total_nutrition["protein"] = round(total_nutrition["protein"], 1)
+    total_nutrition["total_fat"] = round(total_nutrition["total_fat"], 1)
+    total_nutrition["total_carbohydrate"] = round(total_nutrition["total_carbohydrate"], 1)
+
     return {
         "total_nutrition": total_nutrition,
         "detailed_nutrition": detailed_nutrition
