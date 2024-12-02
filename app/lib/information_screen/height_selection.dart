@@ -1,4 +1,4 @@
-import 'package:app/weight_change_selection.dart';
+import 'package:app/information_screen/weight_change_selection.dart';
 import 'package:flutter/material.dart';
 
 class HeightSelectionScreen extends StatefulWidget {

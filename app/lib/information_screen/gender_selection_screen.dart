@@ -1,4 +1,4 @@
-import 'package:app/age_selection_screen.dart';
+import 'package:app/information_screen/age_selection_screen.dart';
 import 'package:flutter/material.dart';
 
 class GenderSelectionScreen extends StatefulWidget {

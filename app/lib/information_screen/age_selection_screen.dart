@@ -1,4 +1,4 @@
-import 'package:app/height_selection.dart';
+import 'package:app/information_screen/height_selection.dart';
 import 'package:flutter/material.dart';
 
 class AgeSelectionScreen extends StatefulWidget {

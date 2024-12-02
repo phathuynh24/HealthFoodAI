@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:app/calorie_tracker_home.dart';
 import 'package:app/orther/themes.dart';
+import 'package:app/product_scan.dart';
 import 'package:app/widgets/health_rating_widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -351,7 +352,14 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductScanScreen()
+                  ),
+                );
+                  },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.black,
                     backgroundColor: Colors.lightBlue[100],

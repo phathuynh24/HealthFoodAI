@@ -28,9 +28,9 @@ class _Screen2State extends State<Screen2> {
     });
 
     // For Mac
-    final url = Uri.parse("http://10.0.2.2:5001/predict");
+    // final url = Uri.parse("http://10.0.2.2:5001/predict");
     // For Windows
-    // final url = Uri.parse("http://10.0.2.2:5000/predict");
+    final url = Uri.parse("http://10.0.2.2:5000/predict");
 
     // Create a multipart request with the image and description
     var request = http.MultipartRequest('POST', url)

@@ -1,4 +1,4 @@
-import 'package:app/calories_plan_screen.dart';
+import 'package:app/information_screen/calories_plan_screen.dart';
 import 'package:flutter/material.dart';
 
 class ActivityLevelScreen extends StatefulWidget {

@@ -1,4 +1,4 @@
-import 'package:app/gender_selection_screen.dart';
+import 'package:app/information_screen/gender_selection_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
