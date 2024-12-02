@@ -18,7 +18,7 @@ class WeightChangeSelectionScreen extends StatefulWidget {
 
 class _WeightChangeSelectionScreenState
     extends State<WeightChangeSelectionScreen> {
-  String selectedGoal = "Gain Weight"; // Mục tiêu mặc định
+  String selectedGoal = "Tăng cân"; // Mục tiêu mặc định
 
   @override
   Widget build(BuildContext context) {
@@ -38,24 +38,16 @@ class _WeightChangeSelectionScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Thanh tiến trình
-            LinearProgressIndicator(
-              value: 0.75, // Tiến trình 75%
-              backgroundColor: Colors.grey[300],
-              color: Colors.green,
-            ),
-            const SizedBox(height: 20),
-
             // Tiêu đề
             const Text(
-              "What is your goal?",
+              "Mục tiêu của bạn là gì?",
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
 
             // Mô tả nhỏ
             const Text(
-              "We use your data solely for the purpose of enhancing your experience and improving our calorie estimation function.",
+              "Chúng tôi chỉ sử dụng dữ liệu của bạn để cải thiện trải nghiệm và tính năng ước lượng calo.",
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 30),
@@ -65,14 +57,14 @@ class _WeightChangeSelectionScreenState
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  buildGoalOption("Lose Weight"),
-                  buildGoalOption("Maintain Weight"),
-                  buildGoalOption("Gain Weight"),
+                  buildGoalOption("Giảm cân"),
+                  buildGoalOption("Duy trì cân nặng"),
+                  buildGoalOption("Tăng cân"),
                 ],
               ),
             ),
 
-            // Nút Next
+            // Nút Tiếp tục
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -81,11 +73,11 @@ class _WeightChangeSelectionScreenState
                     context,
                     MaterialPageRoute(
                       builder: (context) => CurrentWeightScreen(
-                          selectedGender: widget.selectedGender,
-                          selectedAge: widget.selectedAge,
-                          selectedHeight: widget.selectedHeight,
-                          selectedWeightChange: selectedGoal,
-                          ),
+                        selectedGender: widget.selectedGender,
+                        selectedAge: widget.selectedAge,
+                        selectedHeight: widget.selectedHeight,
+                        selectedWeightChange: selectedGoal,
+                      ),
                     ),
                   );
                 },
@@ -94,7 +86,7 @@ class _WeightChangeSelectionScreenState
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: const Text(
-                  "Next",
+                  "Tiếp tục",
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
@@ -121,8 +113,8 @@ class _WeightChangeSelectionScreenState
         decoration: BoxDecoration(
           color: isSelected ? Colors.green[100] : Colors.grey[200],
           border: Border.all(
-            color: isSelected ? Colors.greenAccent : Colors.grey[300]!,
-          width: 2),
+              color: isSelected ? Colors.greenAccent : Colors.grey[300]!,
+              width: 2),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Text(

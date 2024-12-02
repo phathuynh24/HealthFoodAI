@@ -35,7 +35,7 @@ class _HeightSelectionScreenState extends State<HeightSelectionScreen> {
         children: [
           const SizedBox(height: 20),
           const Text(
-            "What's your height?",
+            "Chiều cao của bạn là bao nhiêu?",
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -47,7 +47,7 @@ class _HeightSelectionScreenState extends State<HeightSelectionScreen> {
               child: ListWheelScrollView.useDelegate(
                 itemExtent: 50,
                 diameterRatio: 1.5,
-                controller: FixedExtentScrollController(initialItem: 50), //set the wheel to the midle
+                controller: FixedExtentScrollController(initialItem: 50), // Đặt bánh xe ở giữa
                 onSelectedItemChanged: (index) {
                   setState(() {
                     _selectedHeight = index + 100;
@@ -74,7 +74,7 @@ class _HeightSelectionScreenState extends State<HeightSelectionScreen> {
             padding: const EdgeInsets.all(20),
             child: ElevatedButton(
               onPressed: () {
-              Navigator.push(
+                Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => WeightChangeSelectionScreen(
@@ -89,7 +89,7 @@ class _HeightSelectionScreenState extends State<HeightSelectionScreen> {
                 backgroundColor: Colors.green,
                 minimumSize: const Size(double.infinity, 50),
               ),
-              child: const Text("Next"),
+              child: const Text("Tiếp tục"),
             ),
           ),
         ],

@@ -31,7 +31,7 @@ class _AgeSelectionScreenState extends State<AgeSelectionScreen> {
         children: [
           const SizedBox(height: 30),
           const Text(
-            "How old are you?",
+            "Bạn bao nhiêu tuổi?",
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -41,7 +41,7 @@ class _AgeSelectionScreenState extends State<AgeSelectionScreen> {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              "We use your data solely for the purpose of enhancing your experience and improving our calorie estimation function.",
+              "Chúng tôi chỉ sử dụng dữ liệu của bạn để cải thiện trải nghiệm và tính năng ước lượng calo.",
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey),
             ),
@@ -50,14 +50,13 @@ class _AgeSelectionScreenState extends State<AgeSelectionScreen> {
           Expanded(
             child: Center(
               child: ListWheelScrollView.useDelegate(
-
                 itemExtent: 50,
                 perspective: 0.005,
                 diameterRatio: 1.5,
-                controller: FixedExtentScrollController(initialItem: _selectedAge), //set the wheel to the midle
+                controller: FixedExtentScrollController(initialItem: _selectedAge),
                 onSelectedItemChanged: (index) {
                   setState(() {
-                    _selectedAge = index + 18; 
+                    _selectedAge = index + 18;
                   });
                 },
                 childDelegate: ListWheelChildBuilderDelegate(
@@ -98,7 +97,7 @@ class _AgeSelectionScreenState extends State<AgeSelectionScreen> {
                 backgroundColor: Colors.green,
                 minimumSize: const Size(double.infinity, 50),
               ),
-              child: const Text("Next"),
+              child: const Text("Tiếp tục"),
             ),
           ),
         ],

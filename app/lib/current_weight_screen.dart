@@ -38,12 +38,12 @@ class _CurrentWeightScreenState extends State<CurrentWeightScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text(
-            "What's your current weight?",
+            "Cân nặng hiện tại của bạn là bao nhiêu?",
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           const Text(
-            "Estimate now, adjust later is fine.",
+            "Ước lượng hiện tại, bạn có thể chỉnh sửa sau.",
             style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
           const SizedBox(height: 30),
@@ -155,7 +155,10 @@ class _CurrentWeightScreenState extends State<CurrentWeightScreen> {
                 backgroundColor: Colors.green,
                 minimumSize: const Size(double.infinity, 50),
               ),
-              child: const Text("Next"),
+              child: const Text(
+                "Tiếp tục",
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
             ),
           ),
         ],

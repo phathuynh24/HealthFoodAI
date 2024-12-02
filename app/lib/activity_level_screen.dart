@@ -46,25 +46,25 @@ class _ActivityLevelScreenState extends State<ActivityLevelScreen> {
             SizedBox(height: 20),
             // Tiêu đề
             Text(
-              "What's your activity level?",
+              "Mức độ hoạt động của bạn?",
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
 
             // Danh sách các mức độ vận động
-            buildActivityOption("Not Active",
-                "Mostly sedentary, akin to an office worker or computer programmer."),
-            buildActivityOption("Somewhat Active",
-                "Light daily movement, frequently on feet, similar to a retail worker or nurse."),
-            buildActivityOption("Moderately Active",
-                "Normal work of the day, walk alot or had to do lot of house chore."),
-            buildActivityOption("Highly Active",
-                "Active most of the day, comparable to a warehouse worker or courier."),
-            buildActivityOption("Extremely Active",
-                "Mostly involved in intense physical labor, like a construction worker."),
+            buildActivityOption("Không vận động nhiều",
+                "Chủ yếu ngồi, giống công việc văn phòng hoặc lập trình viên."),
+            buildActivityOption("Hơi vận động",
+                "Di chuyển nhẹ nhàng hàng ngày, thường xuyên đứng, giống như nhân viên bán lẻ hoặc y tá."),
+            buildActivityOption("Vận động vừa phải",
+                "Hoạt động bình thường trong ngày, đi bộ nhiều hoặc làm việc nhà thường xuyên."),
+            buildActivityOption("Vận động nhiều",
+                "Hoạt động liên tục cả ngày, giống nhân viên kho hoặc giao hàng."),
+            buildActivityOption("Vận động rất nhiều",
+                "Thường xuyên làm việc thể lực nặng, giống như công nhân xây dựng."),
             Spacer(),
 
-            // Nút Next
+            // Nút Tiếp tục
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -94,7 +94,7 @@ class _ActivityLevelScreenState extends State<ActivityLevelScreen> {
                   padding: EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: Text(
-                  "Next",
+                  "Tiếp tục",
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),

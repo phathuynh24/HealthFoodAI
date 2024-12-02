@@ -29,7 +29,7 @@ class _GenderSelectionScreenState extends State<GenderSelectionScreen> {
         children: [
           const SizedBox(height: 20),
           const Text(
-            "What's your gender?",
+            "Giới tính của bạn là gì?",
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -39,7 +39,7 @@ class _GenderSelectionScreenState extends State<GenderSelectionScreen> {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              "We use your data solely for the purpose of enhancing your experience and improving our calorie estimation function.",
+              "Chúng tôi chỉ sử dụng dữ liệu của bạn để cải thiện trải nghiệm và tính năng ước lượng calo.",
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey),
             ),
@@ -71,7 +71,7 @@ class _GenderSelectionScreenState extends State<GenderSelectionScreen> {
                           Icon(Icons.male, size: 40, color: Colors.blue),
                           SizedBox(width: 20),
                           Text(
-                            "Male",
+                            "Nam",
                             style: TextStyle(
                               fontSize: 16,
                               color: _selectedGender == "Male"
@@ -107,7 +107,7 @@ class _GenderSelectionScreenState extends State<GenderSelectionScreen> {
                           Icon(Icons.female, size: 40, color: Colors.pink),
                           SizedBox(width: 20),
                           Text(
-                            "Female",
+                            "Nữ",
                             style: TextStyle(
                               fontSize: 16,
                               color: _selectedGender == "Female"
@@ -130,16 +130,16 @@ class _GenderSelectionScreenState extends State<GenderSelectionScreen> {
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Text.rich(
               TextSpan(
-                text: "By tapping Next, you have read and agree to our ",
+                text: "Bằng cách nhấn Tiếp tục, bạn đã đọc và đồng ý với ",
                 style: TextStyle(color: Colors.grey),
                 children: [
                   TextSpan(
-                    text: "Terms of Use",
+                    text: "Điều khoản sử dụng",
                     style: TextStyle(color: Colors.blue),
                   ),
-                  TextSpan(text: " and "),
+                  TextSpan(text: " và "),
                   TextSpan(
-                    text: "Privacy Policy",
+                    text: "Chính sách bảo mật",
                     style: TextStyle(color: Colors.blue),
                   ),
                   TextSpan(text: "."),
@@ -164,7 +164,7 @@ class _GenderSelectionScreenState extends State<GenderSelectionScreen> {
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text("Please select a gender"),
+                      content: Text("Vui lòng chọn giới tính"),
                     ),
                   );
                 }
@@ -173,7 +173,7 @@ class _GenderSelectionScreenState extends State<GenderSelectionScreen> {
                 backgroundColor: Colors.green,
                 minimumSize: const Size(double.infinity, 50),
               ),
-              child: const Text("Next"),
+              child: const Text("Tiếp tục"),
             ),
           ),
         ],
