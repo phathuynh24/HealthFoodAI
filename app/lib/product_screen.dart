@@ -1,6 +1,3 @@
-// import 'package:assist_health/src/others/theme.dart';
-// import 'package:assist_health/src/presentation/screens/user_screens/meals/meal.dart';
-// import 'package:assist_health/src/presentation/screens/user_screens/meals/meal_home.dart';
 import 'package:app/home_meal.dart';
 import 'package:app/meal.dart';
 import 'package:app/orther/themes.dart';
@@ -9,16 +6,16 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class Screen2 extends StatefulWidget {
+class ProductScreen extends StatefulWidget {
   final File image;
 
-  Screen2({required this.image});
+  ProductScreen({required this.image});
 
   @override
-  _Screen2State createState() => _Screen2State();
+  _ProductScreenState createState() => _ProductScreenState();
 }
 
-class _Screen2State extends State<Screen2> {
+class _ProductScreenState extends State<ProductScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   bool isLoading = false;
   // Function to upload the image and description to the server
@@ -30,7 +27,7 @@ class _Screen2State extends State<Screen2> {
     // For Mac
     // final url = Uri.parse("http://10.0.2.2:5001/predict");
     // For Windows
-    final url = Uri.parse("http://10.0.2.2:5000/predict");
+    final url = Uri.parse("http://172.16.1.197:5001/predict");
 
     // Create a multipart request with the image and description
     var request = http.MultipartRequest('POST', url)
@@ -38,7 +35,6 @@ class _Screen2State extends State<Screen2> {
       ..fields['description'] =
           _descriptionController.text; // Add description as form field
 
-    // try {
     var response = await request.send();
     setState(() {
       isLoading = false;
@@ -73,7 +69,6 @@ class _Screen2State extends State<Screen2> {
                 0.0;
 
         List<Nutrition> nutrients = [
-          // Nutrition(name: "Calories", amount: calories),
           Nutrition(name: "Protein", amount: protein),
           Nutrition(name: "Total Carbohydrate", amount: totalCarbs),
           Nutrition(name: "Total Fat", amount: totalFat),
@@ -85,8 +80,8 @@ class _Screen2State extends State<Screen2> {
             builder: (context) => MealHomeScreen(
               meal: Meal(
                 name: foodName,
-                weight: "${servingWeight}g",
-                calories: calories.toInt(),
+                weight: servingWeight,
+                calories: calories,
                 nutrients: nutrients,
                 ingredients: [],
               ),
@@ -146,7 +141,7 @@ class _Screen2State extends State<Screen2> {
             name_en: nameEnglish[nameEnglish.indexOf(name)],
             name_vi: nameVietnamese[nameEnglish.indexOf(name)],
             quantity: double.tryParse(quantity.split(" ")[0]) ?? 0.0,
-            colories: ingredientCalories,
+            calories: ingredientCalories,
           );
         }).toList());
 
@@ -156,8 +151,8 @@ class _Screen2State extends State<Screen2> {
             builder: (context) => MealHomeScreen(
               meal: Meal(
                 name: dishName,
-                weight: "${totalWeight} g",
-                calories: calories.toInt(),
+                weight: totalWeight,
+                calories: calories,
                 nutrients: nutrients,
                 ingredients: ingredientsList,
               ),
@@ -172,34 +167,7 @@ class _Screen2State extends State<Screen2> {
       print("Failed to upload image: ${response.statusCode}");
     }
     isLoading = false;
-    // } catch (e) {
-    //   print("Error uploading image: $e");
-    //   setState(() {
-    //     isLoading = false;
-    //   });
-    //   showErrorDialog(context);
-    // }
   }
-
-  // void showErrorDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text("Error"),
-  //         content: Text("Failed to upload image. Please try again."),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //             child: Text("OK"),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {

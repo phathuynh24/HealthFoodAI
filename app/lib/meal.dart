@@ -1,8 +1,8 @@
 // meal.dart
 class Meal {
   final String name;
-  final String weight;
-  final int calories;
+  final double weight;
+  final double calories;
   final List<Nutrition> nutrients;
   final List<Ingredient> ingredients;
 
@@ -19,13 +19,13 @@ class Ingredient {
   final String name_en;
   final String name_vi;
   final double quantity;
-  final double colories;
+  final double calories;
 
   Ingredient({
     required this.name_en,
     required this.name_vi,
     required this.quantity,
-    required this.colories,
+    required this.calories,
   });
 }
 
