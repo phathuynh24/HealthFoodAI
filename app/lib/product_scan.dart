@@ -1,4 +1,4 @@
-
+import 'package:app/favorite_meals.dart';
 import 'package:app/orther/themes.dart';
 import 'package:app/product_screen.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +50,16 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Screen2(image: _image!),
+        builder: (context) => ProductScreen(image: _image!),
+      ),
+    );
+  }
+
+  void _navigateToFavoriteMealsScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FavoriteMealsScreen(),
       ),
     );
   }
@@ -67,6 +76,8 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
       _pickImageFromCamera();
     } else if (index == 2) {
       _navigateToTextEntryScreen();
+    } else if (index == 3) {
+      _navigateToFavoriteMealsScreen();
     }
   }
 
@@ -75,7 +86,7 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        title: const Text('Snap a photo'),
+        title: const Text('Chọn cách bắt đầu phân tích'),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -92,7 +103,7 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Snap a food photo to analyze and log the calories.",
+              "Chọn một cách để bắt đầu",
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             SizedBox(height: 16),
@@ -102,7 +113,7 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
               onPressed: _pickImageFromCamera,
             ),
             Text(
-              "Analyze & Log",
+              "Chụp ảnh",
               style: TextStyle(fontSize: 16, color: Themes.gradientLightClr),
             ),
           ],
@@ -111,21 +122,28 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onBottomNavigationBarTapped,
-        items: [
+        type: BottomNavigationBarType.fixed,
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.photo_album),
-            label: "Album",
+            label: "Chọn từ album",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.camera_alt),
-            label: "Snap",
+            label: "Chụp ảnh",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.text_fields),
-            label: "Text Entry",
+            label: "Nhập mô tả",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: "Yêu thích",
           ),
         ],
-        selectedItemColor: Themes.gradientDeepClr,
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
       ),
     );
   }
@@ -137,7 +155,7 @@ class TextEntryScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        title: const Text('Enter Description'),
+        title: const Text('Nhập mô tả'),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -159,7 +177,7 @@ class TextEntryScreen extends StatelessWidget {
               // controller: ,
               style: TextStyle(color: Colors.grey[600]),
               decoration: InputDecoration(
-                labelText: "Enter a description of the food",
+                labelText: "Nhập mô tả món ăn",
                 labelStyle: TextStyle(color: Colors.grey[600]),
                 filled: true,
                 fillColor: Colors.grey[200],
@@ -183,10 +201,9 @@ class TextEntryScreen extends StatelessWidget {
                   ),
                 ),
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.send,
-                      color: Colors.grey[600]), // Màu của icon nhạt hơn
+                  icon: Icon(Icons.send, color: Colors.grey[600]),
                   onPressed: () {},
-                  tooltip: "Send",
+                  tooltip: "Gửi",
                 ),
               ),
               maxLines: 5,

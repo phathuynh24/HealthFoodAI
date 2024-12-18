@@ -1,5 +1,4 @@
-import 'package:app/home_meal.dart';
-import 'package:app/meal.dart';
+import 'package:app/calorie_tracker_home.dart';
 import 'package:flutter/material.dart';
 
 class CaloriePlanScreen extends StatelessWidget {
@@ -27,49 +26,6 @@ class CaloriePlanScreen extends StatelessWidget {
     final double bmr = calculateBMR();
     final double tdee = calculateTDEE(bmr);
     final double adjustedCalories = adjustCalories(tdee);
-    final exampleMeal = Meal(
-      name: "Grilled Chicken Salad",
-      weight: "300g",
-      calories: 350,
-      nutrients: [
-        Nutrition(name: "Protein", amount: 30.0),
-        Nutrition(name: "Carbohydrates", amount: 15.0),
-        Nutrition(name: "Fat", amount: 10.0),
-        Nutrition(name: "Fiber", amount: 5.0),
-      ],
-      ingredients: [
-        Ingredient(
-          name_en: "Chicken Breast",
-          name_vi: "Ức gà",
-          quantity: 150.0, // gram
-          colories: 165.0,
-        ),
-        Ingredient(
-          name_en: "Lettuce",
-          name_vi: "Xà lách",
-          quantity: 50.0, // gram
-          colories: 10.0,
-        ),
-        Ingredient(
-          name_en: "Tomatoes",
-          name_vi: "Cà chua",
-          quantity: 50.0, // gram
-          colories: 9.0,
-        ),
-        Ingredient(
-          name_en: "Cucumber",
-          name_vi: "Dưa leo",
-          quantity: 50.0, // gram
-          colories: 8.0,
-        ),
-        Ingredient(
-          name_en: "Olive Oil",
-          name_vi: "Dầu ô liu",
-          quantity: 10.0, // gram
-          colories: 88.0,
-        ),
-      ],
-    );
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green[100],
@@ -147,7 +103,7 @@ class CaloriePlanScreen extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          MealHomeScreen(meal: exampleMeal, imageUrl: ''),
+                          CalorieTrackerHome()
                     ),
                   );
                 },

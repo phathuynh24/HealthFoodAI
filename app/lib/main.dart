@@ -1,4 +1,3 @@
-import 'package:app/information_screen/gender_selection_screen.dart';
 import 'package:app/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:app/product_scan.dart';
