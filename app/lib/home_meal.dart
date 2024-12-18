@@ -298,22 +298,22 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return CalorieTrackerHome();
-                }));
-              },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text("Refine Result"),
-            ),
+            // SizedBox(height: 16),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     Navigator.push(context, MaterialPageRoute(builder: (context) {
+            //       return CalorieTrackerHome();
+            //     }));
+            //   },
+            //   style: ElevatedButton.styleFrom(
+            //     foregroundColor: Colors.white,
+            //     backgroundColor: Colors.green,
+            //     shape: RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.circular(8),
+            //     ),
+            //   ),
+            //   child: Text("Refine Result"),
+            // ),
             SizedBox(height: 16),
             HealthRatingWidget(
               healthRating: // Example health rating (75%)
