@@ -213,7 +213,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
-                            fontSize: 25.sp,
+                            fontSize: 25,
                           ),
                         ),
                         IconButton(

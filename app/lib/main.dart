@@ -1,4 +1,5 @@
 import 'package:app/login_screen.dart';
+import 'package:app/recipe_recommendation_screen';
 import 'package:flutter/material.dart';
 import 'package:app/product_scan.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: RecipeRecommendationScreen(),
     );
   }
 }
