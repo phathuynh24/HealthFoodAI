@@ -1,4 +1,3 @@
-import json
 from flask import Blueprint, request, jsonify
 from utils.image_utils import prepare_image
 from models.ai_model import predict_with_model
@@ -7,9 +6,9 @@ from models.gemini_model import get_gemini_prediction
 from models.gemini_nutritionix import parse_ingredients, calculate_total_nutrition
 from models.gemini_warning import generate_analysis_data, get_gemini_warning, get_normal_warning
 
-main = Blueprint('main', __name__)
+nutrition = Blueprint('nutrition', __name__)
 
-@main.route("/predict", methods=["POST"])
+@nutrition.route("/nutrition/predict", methods=["POST"])
 def predict():
     # Lấy thông tin từ request
     description = request.form.get("description")
