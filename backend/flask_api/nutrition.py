@@ -39,7 +39,7 @@ def predict():
                 'gemini_result': gemini_result,
                 'ingredients': ingredients,
                 'total_nutrition': total_nutrition,
-                'warnings': warnings  # Thêm cảnh báo vào response 
+                'warnings': warnings
             })
         else:
             return jsonify({
@@ -80,7 +80,7 @@ def predict():
                     'gemini_result': gemini_result,
                     'ingredients': ingredients,
                     'total_nutrition': total_nutrition,
-                    'warnings': warnings  # Thêm cảnh báo vào response
+                    'warnings': warnings
                 })
             else:
                 return jsonify({
@@ -91,21 +91,21 @@ def predict():
 
         # Nếu confidence cao, lấy thông tin dinh dưỡng từ AI model
         nutrition_info_model = get_nutrition_info(food_name)
+        print(nutrition_info_model)
         if (blood_pressure is not None) and (blood_sugar is not None):
-            analysis_data = generate_analysis_data(total_nutrition['total_nutrition'], blood_pressure, blood_sugar)
+            analysis_data = generate_analysis_data(nutrition_info_model, blood_pressure, blood_sugar)
             warnings = get_gemini_warning(analysis_data)
         else :
-            warnings = get_normal_warning(total_nutrition['total_nutrition'])
+            warnings = get_normal_warning(nutrition_info_model)
 
         return jsonify({
-            'predictions_model': {
-                'name': food_name,
-                'class': class_name,
-                'name_vi': top_prediction['class_vi'],
-                'score': top_prediction['score'],
-                'nutrition_info': nutrition_info_model,
-            },
-            'warnings': warnings  # Thêm cảnh báo vào response
+            'predictions_model': 'AI model used for image recognition',
+            'name': food_name,
+            'class': class_name,
+            'name_vi': top_prediction['class_vi'],
+            'score': top_prediction['score'],
+            'nutrition_info': nutrition_info_model,
+            'warnings': warnings
         })
 
     # Error handling: If neither image nor description is provided
