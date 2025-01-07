@@ -5,6 +5,9 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 MODEL_PATH = os.getenv("MODEL_PATH")
+NUTRITIONIX_APP_ID = os.getenv("NUTRITIONIX_APP_ID")
+NUTRITIONIX_API_KEY = os.getenv("NUTRITIONIX_API_KEY")
+SPOONACULAR_API_KEY = os.getenv("SPOONACULAR_API_KEY")
 
 # Define the 101 classes for Food-101 dataset with Vietnamese names
 CLASSES = {

@@ -17,6 +17,7 @@ def generate_analysis_data(nutrition_data, blood_pressure, blood_sugar):
             blood_pressure = json.loads(blood_pressure)  # Phân tích chuỗi JSON thành dict
         except json.JSONDecodeError:
             print("Dữ liệu huyết áp không hợp lệ, không thể phân tích chuỗi JSON.")
+            print("Dữ liệu huyết áp:", blood_pressure)
             return {}
         
     systolic = blood_pressure.get('systolic', 0) 
@@ -29,10 +30,10 @@ def generate_analysis_data(nutrition_data, blood_pressure, blood_sugar):
         blood_sugar = 0  # Nếu không phải kiểu số, gán mặc định là 0
 
     # Kiểm tra và ép kiểu dữ liệu cho các thành phần dinh dưỡng (cholesterol, sodium, sugars, carbohydrate)
-    cholesterol = float(nutrition_data.get('cholesterol', 0))
-    sodium = float(nutrition_data.get('sodium', 0))
-    sugars = float(nutrition_data.get('sugars', 0))
-    total_carbohydrate = float(nutrition_data.get('total_carbohydrate', 0))
+    cholesterol = float(nutrition_data.get('cholesterol', 0) or 0)
+    sodium = float(nutrition_data.get('sodium', 0) or 0)
+    sugars = float(nutrition_data.get('sugars', 0) or 0)
+    total_carbohydrate = float(nutrition_data.get('total_carbohydrate', 0) or 0)
 
     # Phân loại tình trạng huyết áp và đường huyết
     critical_blood_pressure = systolic > 180 or diastolic > 120
@@ -108,7 +109,7 @@ def get_gemini_warning(analysis_data, model_name="gemini-1.5-flash"):
         response = model.generate_content([prompt])
 
         # Trả về kết quả từ Gemini
-        return response.text.strip()  # Lấy ra văn bản cảnh báo từ Gemini API
+        return [response.text.strip()]  # Lấy ra văn bản cảnh báo từ Gemini API
 
     except Exception as e:
         # Xử lý lỗi trong quá trình gọi API Gemini
@@ -118,10 +119,10 @@ def get_gemini_warning(analysis_data, model_name="gemini-1.5-flash"):
 # Cảnh báo sức khoẻ khi không có blood_pressure và blood_sugar, dùng if-else để kiểm tra
 def get_normal_warning(nutrition_data):
     # Kiểm tra và ép kiểu dữ liệu cho các thành phần dinh dưỡng (cholesterol, sodium, sugars, carbohydrate)
-    cholesterol = float(nutrition_data.get('cholesterol', 0))
-    sodium = float(nutrition_data.get('sodium', 0))
-    sugars = float(nutrition_data.get('sugars', 0))
-    total_carbohydrate = float(nutrition_data.get('total_carbohydrate', 0))
+    cholesterol = float(nutrition_data.get('cholesterol', 0) or 0)
+    sodium = float(nutrition_data.get('sodium', 0) or 0)
+    sugars = float(nutrition_data.get('sugars', 0) or 0)
+    total_carbohydrate = float(nutrition_data.get('total_carbohydrate', 0) or 0)
 
     analysic_data = {}
     # Kiểm tra thành phần dinh dưỡng của món ăn

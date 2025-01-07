@@ -1,12 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
-
-# Load biến môi trường từ .env
-load_dotenv()
-
-NUTRITIONIX_APP_ID = os.getenv("NUTRITIONIX_APP_ID")
-NUTRITIONIX_API_KEY = os.getenv("NUTRITIONIX_API_KEY")
+from config import NUTRITIONIX_APP_ID, NUTRITIONIX_API_KEY
 
 def get_nutrition_info(food_name):
     """

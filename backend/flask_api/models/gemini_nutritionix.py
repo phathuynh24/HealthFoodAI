@@ -1,13 +1,14 @@
 import os
 import re
 import requests
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
+from config import NUTRITIONIX_APP_ID, NUTRITIONIX_API_KEY
 
-# Load biến môi trường từ .env
-load_dotenv()
+# # Load biến môi trường từ .env
+# load_dotenv()
 
-NUTRITIONIX_APP_ID = os.getenv("NUTRITIONIX_APP_ID")
-NUTRITIONIX_API_KEY = os.getenv("NUTRITIONIX_API_KEY")
+# NUTRITIONIX_APP_ID = os.getenv("NUTRITIONIX_APP_ID")
+# NUTRITIONIX_API_KEY = os.getenv("NUTRITIONIX_API_KEY")
 
 # URL Nutritionix API cho phân tích từng thành phần
 url = "https://trackapi.nutritionix.com/v2/natural/nutrients"
