@@ -50,10 +50,10 @@ def generate_analysis_data(nutrition_data, blood_pressure, blood_sugar):
     analysis_data['blood_sugar_value'] = f"{blood_sugar} mg/dL"
 
     # Kiểm tra thành phần dinh dưỡng của món ăn
-    analysis_data['cholesterol_warning'] = cholesterol > 30
-    analysis_data['sodium_warning'] = sodium > 200
-    analysis_data['sugar_warning'] = sugars > 15
-    analysis_data['carbohydrate_warning'] = total_carbohydrate > 50
+    analysis_data['cholesterol_warning'] = cholesterol > 100
+    analysis_data['sodium_warning'] = sodium > 750
+    analysis_data['sugar_warning'] = sugars > 20
+    analysis_data['carbohydrate_warning'] = total_carbohydrate > 90
 
     # Thêm các giá trị cụ thể của dinh dưỡng
     analysis_data['nutrition_details'] = {
@@ -87,20 +87,15 @@ def get_gemini_warning(analysis_data, model_name="gemini-1.5-flash"):
     - Giá trị đường huyết: {analysis_data['blood_sugar_value']}
 
     Thông tin dinh dưỡng của món ăn:
-    - Cholesterol: {'Cao' if analysis_data['cholesterol_warning'] else 'Thấp'}
-    - Sodium: {'Cao' if analysis_data['sodium_warning'] else 'Thấp'}
-    - Đường: {'Cao' if analysis_data['sugar_warning'] else 'Thấp'}
-    - Carbohydrate: {'Cao' if analysis_data['carbohydrate_warning'] else 'Thấp'}
-    Dựa trên phân tích, hãy đưa ra cảnh báo cho người dùng có nên ăn món ăn này hay không.
+    - Cholesterol: {'Cao' if analysis_data['cholesterol_warning'] else 'Bình thường'}
+    - Sodium: {'Cao' if analysis_data['sodium_warning'] else 'Bình thường'}
+    - Đường: {'Cao' if analysis_data['sugar_warning'] else 'Bình thường'}
+    - Carbohydrate: {'Cao' if analysis_data['carbohydrate_warning'] else 'Bình thường'}
+    Dựa trên phân tích, hãy đưa ra cảnh báo ngắn cho người dùng có nên ăn món ăn này hay không.
     
-    Bạn tham khảo ví dụ này để viết cảnh báo: 
-        "Dựa trên phân tích, tôi khuyên bạn nên chú ý đến các cảnh báo sau:
-        - Mặc dù huyết áp của bạn bình thường (130/80), nhưng đường huyết của bạn (170 mg/dL) cao hơn mức bình thường. Điều này có thể chỉ ra vấn đề về điều tiết đường huyết và cần theo dõi thêm.
+    Bạn tham khảo ví dụ này để viết cảnh báo ngắn này: 
+        - Mặc dù huyết áp của bạn bình thường (130/80), nhưng đường huyết của bạn (170 mg/dL) cao hơn mức bình thường.
         - Món ăn này có lượng cholesterol và sodium cao, không tốt cho tim mạch và huyết áp.
-
-        **Tóm lại:** Món ăn này không phải là lựa chọn lý tưởng cho tình trạng sức khỏe hiện tại của bạn. Hãy ưu tiên những món ăn có hàm lượng cholesterol và sodium thấp hơn để bảo vệ sức khỏe tim mạch và kiểm soát đường huyết hiệu quả.
-
-        Các khuyến nghị: Thử nghiệm với một lượng nhỏ món ăn trước khi ăn nhiều, theo dõi huyết áp và đường huyết sau khi ăn để kiểm tra phản ứng của cơ thể."
     """
 
     try:
@@ -126,10 +121,10 @@ def get_normal_warning(nutrition_data):
 
     analysic_data = {}
     # Kiểm tra thành phần dinh dưỡng của món ăn
-    analysic_data['cholesterol_warning'] = cholesterol > 30
-    analysic_data['sodium_warning'] = sodium > 200
-    analysic_data['sugar_warning'] = sugars > 15
-    analysic_data['carbohydrate_warning'] = total_carbohydrate > 50
+    analysic_data['cholesterol_warning'] = cholesterol > 100  # Điều chỉnh từ 30 mg lên 100 mg
+    analysic_data['sodium_warning'] = sodium > 750           # Điều chỉnh từ 300 mg lên 750 mg
+    analysic_data['sugar_warning'] = sugars > 20             # Điều chỉnh từ 15 g lên 20 g
+    analysic_data['carbohydrate_warning'] = total_carbohydrate > 90  # Điều chỉnh từ 50 g lên 90 g
 
     warnings = []
     if analysic_data['cholesterol_warning']:

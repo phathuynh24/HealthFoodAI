@@ -57,10 +57,10 @@ def suggest_and_translate_recipes():
         include_ingredients = list(set(include_ingredients))
 
         # Adjust nutritional limits based on user input
-        max_calories = nutrition.get('calories', 2000)
-        max_fat = nutrition.get('fat', 70)
+        max_calories = nutrition.get('calories', 800)
+        max_fat = nutrition.get('fat', 30)
         max_protein = nutrition.get('protein', 50)
-        max_carbs = nutrition.get('carbs', 310)
+        max_carbs = nutrition.get('carbs', 100)
 
         # Call Spoonacular API to get recipe suggestions
         recipes = get_recipe_suggestions(
@@ -72,7 +72,7 @@ def suggest_and_translate_recipes():
             cuisine=cuisine,
             include_ingredients=include_ingredients,
             exclude_ingredients=exclude_ingredients,
-            number=3
+            number=6
         )
 
         if not recipes:
@@ -146,9 +146,12 @@ def get_recipe_suggestions(api_key, max_calories, max_fat, max_protein, max_carb
     }
 
     if include_ingredients:
-        params["includeIngredients"] = ",".join(include_ingredients)
+        selected_include = random.sample(include_ingredients, min(len(include_ingredients), 2))
+        params["includeIngredients"] = ",".join(selected_include)
+
     if exclude_ingredients:
-        params["excludeIngredients"] = ",".join(exclude_ingredients)
+        selected_exclude = random.sample(exclude_ingredients, min(len(exclude_ingredients), 2))
+        params["excludeIngredients"] = ",".join(selected_exclude)
 
     try:
         logging.info(f"Calling Spoonacular API with params: {params}")
@@ -188,49 +191,6 @@ def process_and_translate_ingredients(ingredients, model_name="gemini-1.5-flash"
         for ingredient in ingredients:
             ingredient["translated_original"] = "Lỗi khi dịch nguyên liệu"
         return ingredients
-
-# def process_and_translate_introduce(introduce, model_name="gemini-1.5-flash"):
-#     """
-#     Hàm xử lý và dịch toàn bộ phần 'introduce' (bao gồm các bước chế biến) từ tiếng Anh sang tiếng Việt,
-#     gọi Gemini API một lần duy nhất.
-#     """
-#     try:
-#         if not introduce:
-#             return []
-
-#         # Gom tất cả các bước chế biến vào một chuỗi duy nhất
-#         steps_text = ""
-#         for intro in introduce:
-#             steps = intro.get('steps', [])
-#             for step in steps:
-#                 steps_text += f"Bước {step.get('number', 'N/A')}: {step.get('step', '')}\n"
-
-#         # Tạo prompt để dịch chuỗi các bước chế biến
-#         prompt = f"Dịch danh sách các bước chế biến sau sang tiếng Việt:\n{steps_text}"
-#         model = genai.GenerativeModel(model_name)
-#         response = model.generate_content([prompt])
-
-#         # Phân tách bản dịch thành danh sách các bước
-#         translated_lines = response.text.strip().split("\n")
-
-#         # Lặp lại qua tất cả các bước và gắn bản dịch vào trong từng bước
-#         translated_line_index = 0
-#         for intro in introduce:
-#             steps = intro.get('steps', [])
-#             for step in steps:
-#                 if translated_line_index < len(translated_lines):
-#                     step["translated_step"] = translated_lines[translated_line_index]
-#                     translated_line_index += 1
-#                 else:
-#                     step["translated_step"] = "Lỗi khi dịch bước chế biến"
-
-#         return introduce
-
-#     except Exception as e:
-#         logging.error(f"Error translating introduce: {e}")
-#         for intro in introduce:
-#             intro['steps'] = [{"translated_step": "Lỗi khi dịch bước chế biến"}]
-#         return introduce
 
 def process_and_translate_introduce(introduce, model_name="gemini-1.5-flash"):
     """
