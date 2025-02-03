@@ -1,8 +1,8 @@
 import 'package:app/home_meal.dart';
+import 'package:app/models/meal_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'meal.dart';
 
 class FavoriteMealsScreen extends StatefulWidget {
   @override
@@ -133,8 +133,8 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
               // Convert nutrients and ingredients to list of objects
               List<Nutrition> nutrients = (meal['nutrients'] as List<dynamic>?)
                       ?.map((n) => Nutrition(
-                            name: n['name'] ?? "",
-                            amount: (n['amount'] as num?)?.toDouble() ?? 0.0,
+                            nutrientName: n['name'] ?? "",
+                            nutrientValue: (n['amount'] as num?)?.toDouble() ?? 0.0,
                           ))
                       .toList() ??
                   [];
@@ -142,8 +142,8 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
               List<Ingredient> ingredients =
                   (meal['ingredients'] as List<dynamic>?)
                           ?.map((i) => Ingredient(
-                                name_en: i['name_en'] ?? "",
-                                name_vi: i['name_vi'] ?? "",
+                                nameEn: i['nameEn'] ?? "",
+                                nameVi: i['nameVi'] ?? "",
                                 quantity:
                                     (i['quantity'] as num?)?.toDouble() ?? 0.0,
                                 calories:

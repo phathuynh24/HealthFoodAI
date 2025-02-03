@@ -1,5 +1,5 @@
+import 'package:app/core/constants/app_colors.dart';
 import 'package:app/favorite_meals.dart';
-import 'package:app/orther/themes.dart';
 import 'package:app/product_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -88,15 +88,7 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
         foregroundColor: Colors.white,
         title: const Text('Chọn cách bắt đầu phân tích'),
         centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-          ),
-        ),
+        
       ),
       body: Center(
         child: Column(
@@ -109,12 +101,12 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
             SizedBox(height: 16),
             IconButton(
               iconSize: 80,
-              icon: Icon(Icons.camera_alt, color: Themes.gradientDeepClr),
+              icon: Icon(Icons.camera_alt),
               onPressed: _pickImageFromCamera,
             ),
             Text(
               "Chụp ảnh",
-              style: TextStyle(fontSize: 16, color: Themes.gradientLightClr),
+              style: TextStyle(fontSize: 16),
             ),
           ],
         ),
@@ -157,15 +149,6 @@ class TextEntryScreen extends StatelessWidget {
         foregroundColor: Colors.white,
         title: const Text('Nhập mô tả'),
         centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-          ),
-        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

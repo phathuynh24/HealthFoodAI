@@ -16,7 +16,7 @@ class GoalWeightScreen extends StatefulWidget {
     required this.selectedCurrentWeight,
   }) : super(key: key);
   @override
-  _GoalWeightScreenState createState() => _GoalWeightScreenState();
+  State<GoalWeightScreen> createState() => _GoalWeightScreenState();
 }
 
 class _GoalWeightScreenState extends State<GoalWeightScreen> {
@@ -44,12 +44,14 @@ class _GoalWeightScreenState extends State<GoalWeightScreen> {
           ),
           const Text(
             "Cân nặng mục tiêu của bạn là?",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           const Text(
             "Ước lượng hiện tại, bạn có thể chỉnh sửa sau.",
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey),
           ),
           const SizedBox(height: 30),
           Row(

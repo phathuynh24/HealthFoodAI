@@ -1,16 +1,13 @@
 import 'dart:io';
 
-import 'package:app/calorie_tracker_home.dart';
+import 'package:app/core/constants/app_colors.dart';
 import 'package:app/favorite_meals.dart';
-import 'package:app/orther/themes.dart';
-import 'package:app/product_scan.dart';
+import 'package:app/models/meal_model.dart';
 import 'package:app/widgets/health_rating_widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'meal.dart';
 
 class MealHomeScreen extends StatefulWidget {
   final Meal meal;
@@ -73,15 +70,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
         foregroundColor: Colors.white,
         title: Text('Nutrition Detail'),
         centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-          ),
-        ),
+        
         actions: [
           DropdownButton<String>(
             value: selectedMealType,
@@ -291,7 +280,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                                                           "Total Carbohydrate",
                                                           "Total Fat"
                                                         ].contains(
-                                                            nutrient.name))
+                                                            nutrient.nutrientName))
                                                     .map((nutrient) =>
                                                         _buildFoodItem(
                                                             nutrient))
@@ -382,7 +371,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                         SizedBox(height: 4),
                         ...widget.meal.nutrients.map(
                           (nutrient) =>
-                              _buildNutrientRow(nutrient.name, nutrient.amount),
+                              _buildNutrientRow(nutrient.nutrientName, nutrient.nutrientValue),
                         ),
                       ],
                     ),
@@ -649,8 +638,8 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
             .toList(),
         'ingredients': meal.ingredients
             .map((ingredient) => {
-                  'name_en': ingredient.name_en,
-                  'name_vi': ingredient.name_vi,
+                  'nameEn': ingredient.nameEn,
+                  'nameVi': ingredient.nameVi,
                   'quantity': ingredient.quantity * serving,
                   'calories': ingredient.calories * serving,
                 })
@@ -756,7 +745,7 @@ Widget _buildIngredients(List<Ingredient> ingredients, double serving) {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: Text(ingredient.name_vi),
+            child: Text(ingredient.nameVi),
           ),
           Expanded(
             child: Align(
@@ -784,7 +773,7 @@ Widget _buildFoodItem(Nutrition nutrient, {bool isAddMore = false}) {
         Expanded(
           flex: 2,
           child: TextField(
-            controller: TextEditingController(text: nutrient.amount.toString()),
+            controller: TextEditingController(text: nutrient.nutrientValue.toString()),
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
               border: OutlineInputBorder(),
@@ -796,7 +785,7 @@ Widget _buildFoodItem(Nutrition nutrient, {bool isAddMore = false}) {
         Expanded(
           flex: 5,
           child: TextField(
-            controller: TextEditingController(text: nutrient.name),
+            controller: TextEditingController(text: nutrient.nutrientName),
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               isDense: true,

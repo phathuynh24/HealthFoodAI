@@ -1,6 +1,6 @@
+import 'package:app/core/constants/app_colors.dart';
 import 'package:app/home_meal.dart';
-import 'package:app/meal.dart';
-import 'package:app/orther/themes.dart';
+import 'package:app/models/meal_model.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -69,9 +69,9 @@ class _ProductScreenState extends State<ProductScreen> {
                 0.0;
 
         List<Nutrition> nutrients = [
-          Nutrition(name: "Protein", amount: protein),
-          Nutrition(name: "Total Carbohydrate", amount: totalCarbs),
-          Nutrition(name: "Total Fat", amount: totalFat),
+          Nutrition(nutrientName: "Protein", nutrientValue: protein),
+          Nutrition(nutrientName: "Total Carbohydrate", nutrientValue: totalCarbs),
+          Nutrition(nutrientName: "Total Fat", nutrientValue: totalFat),
         ];
 
         Navigator.push(
@@ -109,9 +109,9 @@ class _ProductScreenState extends State<ProductScreen> {
 
         List<Nutrition> nutrients = [
           // Nutrition(name: "Calories", amount: calories),
-          Nutrition(name: "Protein", amount: protein),
-          Nutrition(name: "Total Carbohydrate", amount: totalCarbs),
-          Nutrition(name: "Total Fat", amount: totalFat),
+          Nutrition(nutrientName: "Protein", nutrientValue: protein),
+          Nutrition(nutrientName: "Total Carbohydrate", nutrientValue: totalCarbs),
+          Nutrition(nutrientName: "Total Fat", nutrientValue: totalFat),
         ];
 
         var ingredients = data["ingredients"];
@@ -138,8 +138,8 @@ class _ProductScreenState extends State<ProductScreen> {
               (ingredient["calories"] as num?)?.toDouble() ?? 0.0;
 
           return Ingredient(
-            name_en: nameEnglish[nameEnglish.indexOf(name)],
-            name_vi: nameVietnamese[nameEnglish.indexOf(name)],
+            nameEn: nameEnglish[nameEnglish.indexOf(name)],
+            nameVi: nameVietnamese[nameEnglish.indexOf(name)],
             quantity: double.tryParse(quantity.split(" ")[0]) ?? 0.0,
             calories: ingredientCalories,
           );
@@ -176,15 +176,6 @@ class _ProductScreenState extends State<ProductScreen> {
         foregroundColor: Colors.white,
         title: const Text('Image and description'),
         centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-          ),
-        ),
       ),
       body: Center(
         child: SingleChildScrollView(

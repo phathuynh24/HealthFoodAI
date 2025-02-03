@@ -1,55 +1,62 @@
-import 'package:app/views/user_info_survey/activity_selection_screen.dart';
+import 'package:app/core/constants/firebase_constants.dart';
+import 'package:app/goal_weight_screen.dart';
+import 'package:app/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 
-class GoalWeightScreen extends StatefulWidget {
-  final String selectedGender;
-  final String selectedWeightChange;
-  final int selectedAge;
-  final int selectedHeight;
-  final double selectedCurrentWeight;
-  const GoalWeightScreen({
-    Key? key,
-    required this.selectedWeightChange,
-    required this.selectedGender,
-    required this.selectedAge,
-    required this.selectedHeight,
-    required this.selectedCurrentWeight,
-  }) : super(key: key);
+class CurrentWeightScreen extends StatefulWidget {
+  final Map<String, dynamic> surveyData;
+
+  const CurrentWeightScreen({Key? key, required this.surveyData})
+      : super(key: key);
+
   @override
-  _GoalWeightScreenState createState() => _GoalWeightScreenState();
+  State<CurrentWeightScreen> createState() => _CurrentWeightScreenState();
 }
 
-class _GoalWeightScreenState extends State<GoalWeightScreen> {
-  int integerPart = 70;
-  int decimalPart = 0;
+class _CurrentWeightScreenState extends State<CurrentWeightScreen> {
+  late int integerPart;
+  late int decimalPart;
+
+  @override
+  void initState() {
+    super.initState();
+    double weight = widget.surveyData[UserFields.weight] ?? 70.0;
+    integerPart = weight.floor().clamp(20, 200);
+    decimalPart = ((weight - integerPart) * 10).toInt().clamp(0, 9);
+  }
+
+  void _continueToNextScreen() {
+    double weight = integerPart + (decimalPart / 10);
+    Map<String, dynamic> updatedSurveyData = Map.from(widget.surveyData);
+    updatedSurveyData[UserFields.weight] = weight;
+
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) =>
+    //         GoalWeightScreen(surveyData: updatedSurveyData),
+    //   ),
+    // );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
+      appBar: const CustomAppBar(title: "Cân nặng hiện tại"),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(
-            height: 20,
-          ),
+          const SizedBox(height: 20),
           const Text(
-            "Cân nặng mục tiêu của bạn là?",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            "Cân nặng hiện tại của bạn?",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           const Text(
             "Ước lượng hiện tại, bạn có thể chỉnh sửa sau.",
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey),
           ),
           const SizedBox(height: 30),
           Row(
@@ -57,34 +64,35 @@ class _GoalWeightScreenState extends State<GoalWeightScreen> {
             children: [
               Column(
                 children: [
-                  Container(
-                    height: 200,
-                    width: 100,
+                  SizedBox(
+                    height: 210,
+                    width: 140,
                     child: ListWheelScrollView.useDelegate(
-                      itemExtent: 80,
+                      itemExtent: 90,
                       physics: const FixedExtentScrollPhysics(),
                       onSelectedItemChanged: (index) {
                         setState(() {
-                          integerPart = 30 + index;
+                          integerPart = 20 + index;
                         });
                       },
                       childDelegate: ListWheelChildBuilderDelegate(
                         builder: (context, index) {
+                          String displayWeight = (index + 20).toString();
                           return Center(
                             child: Text(
-                              '${30 + index}',
+                              displayWeight,
                               style: TextStyle(
-                                  fontSize: index + 30 == integerPart ? 68 : 54,
-                                  fontWeight: index + 30 == integerPart
+                                  fontSize: index + 20 == integerPart ? 68 : 54,
+                                  fontWeight: index + 20 == integerPart
                                       ? FontWeight.bold
                                       : FontWeight.normal,
-                                  color: index + 30 == integerPart
+                                  color: index + 20 == integerPart
                                       ? Colors.black
                                       : Colors.grey),
                             ),
                           );
                         },
-                        childCount: 71, // Giới hạn từ 30kg đến 100kg
+                        childCount: 181, // Range from 20 to 200
                       ),
                     ),
                   ),
@@ -94,14 +102,13 @@ class _GoalWeightScreenState extends State<GoalWeightScreen> {
                 ".",
                 style: TextStyle(fontSize: 64, fontWeight: FontWeight.bold),
               ),
-              // Bộ chọn phần thập phân
               Column(
                 children: [
                   SizedBox(
                     height: 200,
                     width: 60,
                     child: ListWheelScrollView.useDelegate(
-                      itemExtent: 80,
+                      itemExtent: 90,
                       physics: const FixedExtentScrollPhysics(),
                       onSelectedItemChanged: (index) {
                         setState(() {
@@ -124,15 +131,18 @@ class _GoalWeightScreenState extends State<GoalWeightScreen> {
                             ),
                           );
                         },
-                        childCount: 10, // Phần thập phân từ 0 đến 9
+                        childCount: 10, // Range from 0 to 9 (0.0 to 0.9 kg)
                       ),
                     ),
                   ),
                 ],
               ),
-              const Text(
-                " kg",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              const Padding(
+                padding: EdgeInsets.only(top: 15),
+                child: Text(
+                  " kg",
+                  style: TextStyle(fontSize: 42, fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),
@@ -140,22 +150,7 @@ class _GoalWeightScreenState extends State<GoalWeightScreen> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
-              onPressed: () {
-                double weight = integerPart + (decimalPart / 10);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ActivitySelectionScreen(
-                      selectedGender: widget.selectedGender,
-                      selectedAge: widget.selectedAge,
-                      selectedHeight: widget.selectedHeight,
-                      selectedCurrentWeight: widget.selectedCurrentWeight,
-                      selectedGoalWeight: weight,
-                      selectedWeightChange: widget.selectedWeightChange,
-                    ),
-                  ),
-                );
-              },
+              onPressed: _continueToNextScreen,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 minimumSize: const Size(double.infinity, 50),
