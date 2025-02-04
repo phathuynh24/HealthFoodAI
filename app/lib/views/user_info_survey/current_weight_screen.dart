@@ -1,4 +1,4 @@
-import 'package:app/core/constants/firebase_constants.dart';
+import 'package:app/core/firebase/firebase_constants.dart';
 import 'package:app/views/user_info_survey/activity_selection_screen.dart';
 import 'package:app/views/user_info_survey/goal_weight_screen.dart';
 import 'package:app/widgets/custom_app_bar.dart';

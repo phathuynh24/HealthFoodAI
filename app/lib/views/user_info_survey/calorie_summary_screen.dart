@@ -1,4 +1,4 @@
-import 'package:app/core/constants/firebase_constants.dart';
+import 'package:app/core/firebase/firebase_constants.dart';
 import 'package:app/views/home/home_screen.dart';
 import 'package:app/widgets/custom_app_bar.dart';
 import 'package:app/widgets/custom_snackbar.dart';
@@ -184,6 +184,7 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
         UserFields.goal: widget.surveyData[UserFields.goal],
         UserFields.calories: roundedCalories,
         UserFields.updatedAt: currentTimestamp,
+        UserFields.isFirstLogin: false,
       });
 
       // Save survey history
@@ -203,9 +204,10 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
       if (context.mounted) {
         CustomSnackbar.show(context, "Lưu thông tin thành công!",
             isSuccess: true);
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (route) => false,
         );
       }
     } catch (e) {

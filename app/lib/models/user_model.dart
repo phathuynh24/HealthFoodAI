@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:app/core/constants/firebase_constants.dart';
+import 'package:app/core/firebase/firebase_constants.dart';
 
 class UserModel {
   final String uid;

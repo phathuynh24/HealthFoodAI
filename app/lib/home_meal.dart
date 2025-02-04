@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:app/core/constants/app_colors.dart';
+import 'package:app/core/theme/app_colors.dart';
 import 'package:app/favorite_meals.dart';
 import 'package:app/models/meal_model.dart';
 import 'package:app/widgets/health_rating_widgets.dart';

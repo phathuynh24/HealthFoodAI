@@ -1,7 +1,7 @@
-import 'package:app/core/constants/firebase_constants.dart';
+import 'package:app/core/firebase/firebase_constants.dart';
 import 'package:app/models/user_model.dart';
 import 'package:app/views/auth/forgot_password_screen.dart';
-import 'package:app/views/home/home_screen.dart';
+import 'package:app/views/main_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
           UserFields.email: currentUser.email,
           UserFields.isFirstLogin: currentUser.isFirstLogin,
         };
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => GenderSelectionScreen(surveyData: surveyData),
@@ -86,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
       else {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
         );
       }
     } on FirebaseAuthException catch (e) {

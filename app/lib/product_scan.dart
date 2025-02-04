@@ -1,4 +1,4 @@
-import 'package:app/core/constants/app_colors.dart';
+import 'package:app/core/theme/app_colors.dart';
 import 'package:app/favorite_meals.dart';
 import 'package:app/product_screen.dart';
 import 'package:flutter/material.dart';
