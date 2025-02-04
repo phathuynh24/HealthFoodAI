@@ -1,100 +1,93 @@
-import 'package:app/views/user_info_survey/calories_plan_screen.dart';
+import 'package:app/core/constants/firebase_constants.dart';
+import 'package:app/views/user_info_survey/calorie_summary_screen.dart';
+import 'package:app/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class ActivitySelectionScreen extends StatefulWidget {
-  final String selectedGender;
-  final String selectedWeightChange;
-  final int selectedAge;
-  final int selectedHeight;
-  final double selectedCurrentWeight;
-  final double selectedGoalWeight;
-  const ActivitySelectionScreen({
-    Key? key,
-    required this.selectedWeightChange,
-    required this.selectedGender,
-    required this.selectedAge,
-    required this.selectedHeight,
-    required this.selectedCurrentWeight,
-    required this.selectedGoalWeight,
-  }) : super(key: key);
+  final Map<String, dynamic> surveyData;
+
+  const ActivitySelectionScreen({Key? key, required this.surveyData})
+      : super(key: key);
+
   @override
-  _ActivitySelectionScreenState createState() =>
+  State<ActivitySelectionScreen> createState() =>
       _ActivitySelectionScreenState();
 }
 
 class _ActivitySelectionScreenState extends State<ActivitySelectionScreen> {
-  String selectedActivityLevel = ""; // Lưu trữ mức độ vận động được chọn
+  String selectedActivityLevel = "";
+
+  @override
+  void initState() {
+    super.initState();
+    selectedActivityLevel =
+        widget.surveyData[UserFields.activityLevel] ?? "";
+  }
+
+  void _continueToNextScreen() {
+    Map<String, dynamic> updatedSurveyData = Map.from(widget.surveyData);
+    updatedSurveyData[UserFields.activityLevel] = selectedActivityLevel;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CalorieSummaryScreen(surveyData: updatedSurveyData),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.green[100],
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: Container(
-        padding: EdgeInsets.all(16.0),
-        color: Colors.green[50],
+      appBar: const CustomAppBar(title: "Chọn Mức Độ Hoạt Động"),
+      body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 20),
-            // Tiêu đề
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               "Mức độ hoạt động của bạn?",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                "Chúng tôi chỉ sử dụng thông tin này để cá nhân hóa lượng calo phù hợp.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            const SizedBox(height: 20),
 
-            // Danh sách các mức độ vận động
-            buildActivityOption("Không vận động nhiều",
-                "Chủ yếu ngồi, giống công việc văn phòng hoặc lập trình viên."),
-            buildActivityOption("Hơi vận động",
-                "Di chuyển nhẹ nhàng hàng ngày, thường xuyên đứng, giống như nhân viên bán lẻ hoặc y tá."),
-            buildActivityOption("Vận động vừa phải",
-                "Hoạt động bình thường trong ngày, đi bộ nhiều hoặc làm việc nhà thường xuyên."),
-            buildActivityOption("Vận động nhiều",
-                "Hoạt động liên tục cả ngày, giống nhân viên kho hoặc giao hàng."),
-            buildActivityOption("Vận động rất nhiều",
-                "Thường xuyên làm việc thể lực nặng, giống như công nhân xây dựng."),
-            Spacer(),
-
-            // Nút Tiếp tục
-            SizedBox(
-              width: double.infinity,
+            ListView(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                buildActivityOption("Không vận động nhiều",
+                    "Chủ yếu ngồi, ít hoạt động. Ví dụ: công việc văn phòng."),
+                buildActivityOption("Hơi vận động",
+                    "Di chuyển nhẹ nhàng hàng ngày, đứng thường xuyên. Ví dụ: nhân viên bán lẻ."),
+                buildActivityOption("Vận động vừa phải",
+                    "Hoạt động thường xuyên, đi bộ nhiều hoặc làm việc nhà."),
+                buildActivityOption("Vận động nhiều",
+                    "Hoạt động liên tục cả ngày. Ví dụ: nhân viên kho, giao hàng."),
+                buildActivityOption("Vận động rất nhiều",
+                    "Thường xuyên làm việc thể lực nặng. Ví dụ: công nhân xây dựng."),
+              ],
+            ),
+        
+            Padding(
+              padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: selectedActivityLevel.isEmpty
-                    ? null
-                    : () {
-                        // Chuyển sang màn hình tính toán calories
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CaloriePlanScreen(
-                              activityLevel: selectedActivityLevel,
-                              gender: widget.selectedGender,
-                              age: widget.selectedAge,
-                              height: widget.selectedHeight,
-                              targetWeight: widget.selectedGoalWeight,
-                              weight: widget.selectedCurrentWeight,
-                              goal: widget.selectedWeightChange,
-                            ),
-                          ),
-                        );
-                      },
+                onPressed: selectedActivityLevel.isEmpty ? null : _continueToNextScreen,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: selectedActivityLevel.isEmpty
-                      ? Colors.grey
-                      : Colors.green,
-                  padding: EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: selectedActivityLevel.isEmpty ? Colors.grey : Colors.green,
+                  minimumSize: const Size(double.infinity, 50),
                 ),
-                child: Text(
+                child: const Text(
                   "Tiếp tục",
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
@@ -106,20 +99,15 @@ class _ActivitySelectionScreenState extends State<ActivitySelectionScreen> {
     );
   }
 
-  // Widget hiển thị từng mức độ vận động
   Widget buildActivityOption(String title, String description) {
-    final isSelected = selectedActivityLevel == title;
+    final bool isSelected = selectedActivityLevel == title;
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedActivityLevel = title;
-        });
-      },
+      onTap: () => setState(() => selectedActivityLevel = title),
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 8),
-        padding: EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.green[100] : Colors.white,
+          color: isSelected ? Colors.green[50] : Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected ? Colors.green : Colors.grey,
@@ -137,7 +125,7 @@ class _ActivitySelectionScreenState extends State<ActivitySelectionScreen> {
                 color: isSelected ? Colors.green : Colors.black,
               ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               description,
               style: TextStyle(

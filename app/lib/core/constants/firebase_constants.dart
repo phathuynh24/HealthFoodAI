@@ -21,4 +21,5 @@ class UserFields {
   static const String createdAt = "createdAt";
   static const String updatedAt = "updatedAt";
   static const String surveyHistory = "surveyHistory";
+  static const String timestamp = "timestamp";
 }
