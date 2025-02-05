@@ -43,18 +43,35 @@ class MealFields {
   static const String type = "type";
   static const String userId = "userId";
   static const String imageUrl = "imageUrl";
+
+  // Fields for Food Scan
+  static const String description = "description"; // Description of the meal
+  static const String bloodSugar = "blood_sugar"; // Đường huyết
+  static const String bloodPressure = "blood_pressure"; // Huyết áp (JSON: systolic, diastolic)
+  static const String predictedName = "name"; // Name of the meal
+  static const String servingWeight = "serving_weight_grams"; // Weight of the meal
 }
 
 /// Fields of Nutrients
 class NutritionFields {
   static const String name = "name";
   static const String amount = "amount";
+
+  // Nutrient names
+  static const String protein = "protein";
+  static const String totalCarbs = "total_carbohydrate";
+  static const String totalFat = "total_fat";
 }
 
 /// Fields of Ingredients
 class IngredientFields {
   static const String nameEn = "name_en";
   static const String nameVi = "name_vi";
+  static const String nameEnglish = "name_english";
+  static const String nameVietnamese = "name_vietnamese";
   static const String quantity = "quantity";
   static const String calories = "calories";
+
+  // Ingredient names
+  static const String detailedIngredients = "detailed_nutrition";
 }

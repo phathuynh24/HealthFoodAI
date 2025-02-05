@@ -12,6 +12,7 @@ class MealModel {
   final String type;
   final String userId;
   final String imageUrl;
+  final List<dynamic> warnings;
 
   MealModel({
     required this.name,
@@ -25,6 +26,7 @@ class MealModel {
     required this.type,
     required this.userId,
     required this.imageUrl,
+    required this.warnings,
   });
 
   /// Map to Model
@@ -42,6 +44,7 @@ class MealModel {
         type: '',
         userId: '',
         imageUrl: '',
+        warnings: [],
       );
     }
 
@@ -67,6 +70,24 @@ class MealModel {
       type: map[MealFields.type] ?? '',
       userId: map[MealFields.userId] ?? '',
       imageUrl: map[MealFields.imageUrl] ?? '',
+      warnings: map[MealFields.warnings] ?? [],
+    );
+  }
+
+  MealModel copyWith({List<IngredientModel>? newIngredients}) {
+    return MealModel(
+      name: name,
+      weight: weight,
+      calories: calories,
+      nutrients: nutrients,
+      ingredients: newIngredients ?? ingredients,
+      warnings: warnings,
+      isFavorite: isFavorite,
+      loggedAt: loggedAt,
+      savedAt: savedAt,
+      type: type,
+      userId: userId,
+      imageUrl: imageUrl,
     );
   }
 }

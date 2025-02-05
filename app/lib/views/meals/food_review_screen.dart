@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:app/core/firebase/firebase_constants.dart';
+import 'package:app/views/meals/food_detail_screen.dart';
 import 'package:app/widgets/custom_snackbar.dart';
 import 'package:app/widgets/loading_indicator.dart';
 import 'package:http/http.dart' as http;
@@ -24,172 +26,195 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
   final TextEditingController _systolicController = TextEditingController();
   final TextEditingController _diastolicController = TextEditingController();
   bool isLoading = false;
-
-  // Trạng thái dữ liệu đã nhập
   bool isHealthInfoEntered = false;
 
-  Future<void> uploadImage(BuildContext context) async {
+  Future<void> uploadImage() async {
+    if (isLoading) return;
+
     setState(() {
       isLoading = true;
     });
 
-    final url = Uri.parse(ApiConstants.getPredictNutritionUrl());
+    try {
+      final url = Uri.parse(ApiConstants.getPredictNutritionUrl());
+      var request = http.MultipartRequest('POST', url)
+        ..files
+            .add(await http.MultipartFile.fromPath('image', widget.image.path))
+        ..fields[MealFields.description] = _descriptionController.text;
 
-    var request = http.MultipartRequest('POST', url)
-      ..files.add(await http.MultipartFile.fromPath('image', widget.image.path))
-      ..fields['description'] = _descriptionController.text;
+      // Nếu có dữ liệu về đường huyết, thêm vào request
+      if (_bloodSugarController.text.isNotEmpty) {
+        request.fields[MealFields.bloodSugar] = _bloodSugarController.text;
+      }
 
-    // Thêm đường huyết vào yêu cầu nếu có
-    if (_bloodSugarController.text.isNotEmpty) {
-      request.fields['blood_sugar'] = _bloodSugarController.text;
-    }
+      // Nếu có dữ liệu về huyết áp, thêm vào request
+      if (_systolicController.text.isNotEmpty &&
+          _diastolicController.text.isNotEmpty) {
+        request.fields[MealFields.bloodPressure] = jsonEncode({
+          "systolic": int.tryParse(_systolicController.text) ?? 0,
+          "diastolic": int.tryParse(_diastolicController.text) ?? 0,
+        });
+      }
 
-    // Thêm huyết áp vào yêu cầu nếu có
-    if (_systolicController.text.isNotEmpty &&
-        _diastolicController.text.isNotEmpty) {
-      request.fields['blood_pressure'] = jsonEncode({
-        "systolic": int.tryParse(_systolicController.text) ?? 0,
-        "diastolic": int.tryParse(_diastolicController.text) ?? 0,
-      });
-    }
-
-    var response = await request.send();
-    setState(() {
-      isLoading = false;
-    });
-
-    if (response.statusCode == 200) {
+      // Gửi request
+      var response = await request.send();
       var responseBody = await response.stream.bytesToString();
       var data = json.decode(responseBody);
-      // print('Response: $data');
+      debugPrint("Response: $data");
 
-      if (data.containsKey("predictions_model")) {
-        // var foodName = data["name"];
-        double calories =
-            (data["NutritionModel_info"]["calories"] as num?)?.toDouble() ??
-                0.0;
-        double protein =
-            (data["NutritionModel_info"]["protein"] as num?)?.toDouble() ?? 0.0;
-        double totalCarbs =
-            (data["NutritionModel_info"]["total_carbohydrate"] as num?)
-                    ?.toDouble() ??
-                0.0;
-        double totalFat =
-            (data["NutritionModel_info"]["total_fat"] as num?)?.toDouble() ??
-                0.0;
-        double servingWeight =
-            (data["NutritionModel_info"]["serving_weight_grams"] as num?)
-                    ?.toDouble() ??
-                0.0;
+      if (!mounted) return;
 
-        List<NutritionModel> nutrients = [
-          NutritionModel(name: "Protein", amount: protein),
-          NutritionModel(name: "Total Carbohydrate", amount: totalCarbs),
-          NutritionModel(name: "Total Fat", amount: totalFat),
-        ];
-
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => MealHomeScreen(
-        //       meal: Meal(
-        //         name: foodName,
-        //         weight: servingWeight,
-        //         calories: calories,
-        //         nutrients: nutrients,
-        //         IngredientModels: [],
-        //         warnings: data['warnings'] ?? [],
-        //       ),
-        //       imageUrl: widget.image.path,
-        //     ),
-        //   ),
-        // );
-      } else if (data.containsKey("gemini_result")) {
-        var totalNutritionModel =
-            data["total_NutritionModel"]["total_NutritionModel"];
-        double calories =
-            (totalNutritionModel["calories"] as num?)?.toDouble() ?? 0.0;
-        double protein =
-            (totalNutritionModel["protein"] as num?)?.toDouble() ?? 0.0;
-        double totalCarbs =
-            (totalNutritionModel["total_carbohydrate"] as num?)?.toDouble() ??
-                0.0;
-        double totalFat =
-            (totalNutritionModel["total_fat"] as num?)?.toDouble() ?? 0.0;
-
-        var geminiResult = data["gemini_result"];
-        var englishNameMatch =
-            RegExp(r'English:\s*([^,]+)').firstMatch(geminiResult);
-        String dishName = englishNameMatch != null
-            ? englishNameMatch.group(1) ?? "Dish"
-            : "Dish";
-
-        List<NutritionModel> nutrients = [
-          NutritionModel(name: "Protein", amount: protein),
-          NutritionModel(name: "Total Carbohydrate", amount: totalCarbs),
-          NutritionModel(name: "Total Fat", amount: totalFat),
-        ];
-
-        var IngredientModels = data["IngredientModels"];
-        var nameEnglish = IngredientModels.map(
-            (IngredientModel) => IngredientModel["name_english"]).toList();
-        var nameVietnamese = IngredientModels.map(
-            (IngredientModel) => IngredientModel["name_vietnamese"]).toList();
-
-        var detailIngredientModels =
-            data["total_NutritionModel"]["detailed_NutritionModel"];
-        double totalWeight =
-            detailIngredientModels.fold(0.0, (sum, IngredientModel) {
-          String quantity = IngredientModel["quantity"];
-          double weight = double.tryParse(quantity.split(" ")[0]) ?? 0.0;
-          return sum + weight;
-        });
-
-        List<IngredientModel> IngredientModelsList = [];
-
-        IngredientModelsList.addAll(
-            detailIngredientModels.map<IngredientModel>((IngredientModel) {
-          String name = IngredientModel["name"];
-          String quantity = IngredientModel["quantity"];
-          double IngredientModelCalories =
-              (IngredientModel["calories"] as num?)?.toDouble() ?? 0.0;
-
-          return IngredientModel(
-            name_en: nameEnglish[nameEnglish.indexOf(name)],
-            name_vi: nameVietnamese[nameEnglish.indexOf(name)],
-            quantity: double.tryParse(quantity.split(" ")[0]) ?? 0.0,
-            calories: IngredientModelCalories,
-          );
-        }).toList());
-
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => MealHomeScreen(
-        //       meal: Meal(
-        //         name: dishName,
-        //         weight: totalWeight,
-        //         calories: calories,
-        //         nutrients: nutrients,
-        //         IngredientModels: IngredientModelsList,
-        //         warnings: data['warnings'] ?? [],
-        //       ),
-        //       imageUrl: widget.image.path,
-        //     ),
-        //   ),
-        // );
+      if (response.statusCode == 200) {
+        _handleApiResponse(context, data);
       } else {
-        CustomSnackbar.show(context, "Không thể xác định món ăn!",
+        CustomSnackbar.show(context, "Lỗi: ${response.reasonPhrase}",
             isSuccess: false);
       }
+    } catch (e) {
+      if (e is SocketException) {
+        CustomSnackbar.show(context, "Không thể kết nối đến máy chủ!",
+            isSuccess: false);
+      } else {
+        CustomSnackbar.show(context, "Lỗi khi tải lên ảnh: $e",
+            isSuccess: false);
+      }
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _handleApiResponse(BuildContext context, Map<String, dynamic> data) {
+    if (data.containsKey("predictions_model")) {
+      _processPredictionModel(context, data);
+    } else if (data.containsKey("gemini_result")) {
+      _processGeminiModel(context, data);
     } else {
-      print("Failed to upload image: ${response.statusCode}");
-      CustomSnackbar.show(context, "Lỗi: ${response.reasonPhrase}",
+      CustomSnackbar.show(context, "Không thể xác định món ăn!",
           isSuccess: false);
     }
-    setState(() {
-      isLoading = false;
-    });
+  }
+
+  void _processPredictionModel(
+      BuildContext context, Map<String, dynamic> data) {
+    var foodName = data[MealFields.predictedName] ?? "Món ăn chưa xác định";
+    double calories =
+        (data["nutrition_info"][MealFields.calories] as num?)?.toDouble() ??
+            0.0;
+    double protein =
+        (data["nutrition_info"][NutritionFields.protein] as num?)?.toDouble() ??
+            0.0;
+    double totalCarbs =
+        (data["nutrition_info"][NutritionFields.totalCarbs] as num?)
+                ?.toDouble() ??
+            0.0;
+    double totalFat = (data["nutrition_info"][NutritionFields.totalFat] as num?)
+            ?.toDouble() ??
+        0.0;
+    double servingWeight =
+        (data["nutrition_info"][MealFields.servingWeight] as num?)
+                ?.toDouble() ??
+            0.0;
+
+    List<NutritionModel> nutrients = [
+      NutritionModel(name: "Protein", amount: protein),
+      NutritionModel(name: "Total Carbohydrate", amount: totalCarbs),
+      NutritionModel(name: "Total Fat", amount: totalFat),
+    ];
+
+    _navigateToMealScreen(
+        context, foodName, servingWeight, calories, nutrients, []);
+  }
+
+  void _processGeminiModel(BuildContext context, Map<String, dynamic> data) {
+    var totalNutrition = data["total_nutrition"]["total_nutrition"];
+    double calories =
+        (totalNutrition[MealFields.calories] as num?)?.toDouble() ?? 0.0;
+    double protein =
+        (totalNutrition[NutritionFields.protein] as num?)?.toDouble() ?? 0.0;
+    double totalCarbs =
+        (totalNutrition[NutritionFields.totalCarbs] as num?)?.toDouble() ?? 0.0;
+    double totalFat =
+        (totalNutrition[NutritionFields.totalFat] as num?)?.toDouble() ?? 0.0;
+
+    var geminiResult = data["gemini_result"];
+    // var englishNameMatch =
+    //     RegExp(r'English:\s*([^,]+)').firstMatch(geminiResult);
+    var vietnameseNameMatch =
+        RegExp(r'Vietnamese:\s*([^,]+)').firstMatch(geminiResult);
+    String dishName = vietnameseNameMatch != null
+        ? vietnameseNameMatch.group(1) ?? "Dish"
+        : "Dish";
+
+    List<NutritionModel> nutrients = [
+      NutritionModel(name: "Protein", amount: protein),
+      NutritionModel(name: "Total Carbohydrate", amount: totalCarbs),
+      NutritionModel(name: "Total Fat", amount: totalFat),
+    ];
+
+    List<IngredientModel> ingredientsList = _extractIngredients(data);
+
+    _navigateToMealScreen(
+        context, dishName, 0.0, calories, nutrients, ingredientsList);
+  }
+
+  List<IngredientModel> _extractIngredients(Map<String, dynamic> data) {
+    var ingredients = data["ingredients"];
+    var nameEnglish = ingredients
+        .map((ingredient) => ingredient[IngredientFields.nameEnglish])
+        .toList();
+    var nameVietnamese = ingredients
+        .map((ingredient) => ingredient[IngredientFields.nameVietnamese])
+        .toList();
+
+    var detailIngredients = data["total_nutrition"]["detailed_nutrition"];
+    return detailIngredients.map<IngredientModel>((ingredient) {
+      String name = ingredient["name"];
+      String quantity = ingredient["quantity"];
+      double calories =
+          (ingredient[IngredientFields.calories] as num?)?.toDouble() ?? 0.0;
+      return IngredientModel(
+        nameEn: nameEnglish[nameEnglish.indexOf(name)],
+        nameVi: nameVietnamese[nameEnglish.indexOf(name)],
+        quantity: double.tryParse(quantity.split(" ")[0]) ?? 0.0,
+        calories: calories,
+      );
+    }).toList();
+  }
+
+  void _navigateToMealScreen(
+    BuildContext context,
+    String dishName,
+    double servingWeight,
+    double calories,
+    List<NutritionModel> nutrients,
+    List<IngredientModel> ingredients,
+  ) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FoodDetailScreen(
+          meal: MealModel(
+            name: dishName,
+            weight: servingWeight,
+            calories: calories,
+            nutrients: nutrients,
+            ingredients: ingredients,
+            warnings: [],
+            isFavorite: false,
+            loggedAt: DateTime.now().toString(),
+            savedAt: DateTime.now().toString(),
+            type: "scanned",
+            userId: "user_id",
+            imageUrl: widget.image.path,
+          ),
+          imageUrl: widget.image.path,
+        ),
+      ),
+      (route) =>
+          route.isFirst, // Remove all previous routes, except Home Screen
+    );
   }
 
   // Open the health info sheet
@@ -223,6 +248,7 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
                 hint: "Ví dụ: 110",
                 icon: Icons.water_drop,
                 iconColor: AppColors.activeColor,
+                isNumeric: true,
               ),
               Row(
                 children: [
@@ -233,6 +259,7 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
                       hint: "Ví dụ: 120",
                       icon: Icons.favorite,
                       iconColor: AppColors.activeColor,
+                      isNumeric: true,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -243,6 +270,7 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
                       hint: "Ví dụ: 80",
                       icon: Icons.favorite_border,
                       iconColor: AppColors.activeColor,
+                      isNumeric: true,
                     ),
                   ),
                 ],
@@ -253,10 +281,7 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      setState(() {
-                        isHealthInfoEntered = true;
-                      });
-                      Navigator.pop(context);
+                      saveHealthData();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
@@ -271,14 +296,7 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      setState(() {
-                        // Clear all input fields
-                        _bloodSugarController.clear();
-                        _systolicController.clear();
-                        _diastolicController.clear();
-                        isHealthInfoEntered = false;
-                      });
-                      Navigator.pop(context);
+                      clearHealthData();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
@@ -299,6 +317,33 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
         );
       },
     );
+  }
+
+  void clearHealthData() {
+    setState(() {
+      _bloodSugarController.clear();
+      _systolicController.clear();
+      _diastolicController.clear();
+      isHealthInfoEntered = false;
+    });
+    Navigator.pop(context);
+  }
+
+  void saveHealthData() {
+    if (_bloodSugarController.text.isNotEmpty &&
+        _systolicController.text.isNotEmpty &&
+        _diastolicController.text.isNotEmpty) {
+      setState(() {
+        isHealthInfoEntered = true;
+      });
+
+      CustomSnackbar.show(context, "Thông tin sức khỏe đã được lưu!",
+          isSuccess: true);
+      Navigator.pop(context);
+    } else {
+      CustomSnackbar.show(context, "Vui lòng nhập đầy đủ thông tin sức khỏe!",
+          isSuccess: false);
+    }
   }
 
   @override
@@ -383,9 +428,7 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
                     /// Upload Button
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          uploadImage(context);
-                        },
+                        onPressed: () => uploadImage(),
                         icon: const Icon(Icons.cloud_upload),
                         label: const Text('Xác nhận',
                             style: TextStyle(
@@ -423,12 +466,13 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
     String? hint,
     IconData? icon,
     Color? iconColor,
+    bool isNumeric = false,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
         controller: controller,
-        keyboardType: TextInputType.text,
+        keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,

@@ -1,4 +1,4 @@
-import 'package:app/views/meals/home_meal.dart';
+import 'package:app/views/meals/food_detail_screen.dart';
 import 'package:app/models/meal_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -163,7 +163,7 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => MealHomeScreen(
+                        builder: (context) => FoodDetailScreen(
                           meal: MealModel(
                             name: name,
                             calories: calories,
@@ -176,6 +176,7 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
                             type: meal['type'] ?? "",
                             userId: meal['userId'] ?? "",
                             imageUrl: imageUrl,
+                            warnings: meal['warnings'] ?? [],
                           ),
                           imageUrl: imageUrl,
                           isFavorite: true,
