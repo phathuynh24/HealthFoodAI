@@ -30,8 +30,6 @@ flutter:
     - assets/app_icon.png
     - assets/register.png
     - assets/forgot_password.png
-    - assets/male.png
-    - assets/female.png
-    - assets/describe_food.jpg
+    - assets/camera_scan.png
     - assets/empty_glass.png
     - assets/glass.png

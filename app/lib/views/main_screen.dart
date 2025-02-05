@@ -1,10 +1,20 @@
 import "package:app/core/theme/app_colors.dart";
+import "package:app/views/meals/food_scan_screen.dart";
 import "package:app/views/home/home_screen.dart";
 import "package:flutter/material.dart";
 import "package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart";
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
+
+  void _navigateToFoodScan(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const FoodScanScreen(),
+        fullscreenDialog: true,
+      ),
+    );
+  }
 
   List<PersistentTabConfig> _tabs() => [
         // Home Screen
@@ -22,17 +32,26 @@ class MainScreen extends StatelessWidget {
           screen: const SafeArea(child: Center(child: Text("Gợi ý món ăn"))),
           item: ItemConfig(
             icon: const Icon(Icons.restaurant_menu),
-            title: "Gợi ý món ăn",
+            title: "Món ăn",
             activeForegroundColor: AppColors.activeColor,
             inactiveForegroundColor: Colors.grey,
           ),
         ),
-        // Regonize Screen
+        // Scan Screen
         PersistentTabConfig(
-          screen: const SafeArea(child: Center(child: Text("➕ Chức năng giữa"))),
+          screen: const SizedBox(),
           item: ItemConfig(
-            icon: _buildCenterButton(),
-            title: "Nhận diện món ăn",
+            icon: Builder(
+              builder: (context) {
+                return GestureDetector(
+                  onTap: () {
+                    _navigateToFoodScan(context);
+                  },
+                  child: _buildCenterButton(),
+                );
+              },
+            ),
+            title: "Scan",
             activeForegroundColor: Colors.transparent,
             inactiveForegroundColor: Colors.transparent,
           ),

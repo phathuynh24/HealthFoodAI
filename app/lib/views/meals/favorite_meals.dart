@@ -1,4 +1,4 @@
-import 'package:app/home_meal.dart';
+import 'package:app/views/meals/home_meal.dart';
 import 'package:app/models/meal_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -131,17 +131,19 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
               final imageUrl = meal['imageUrl'] ?? "";
 
               // Convert nutrients and ingredients to list of objects
-              List<Nutrition> nutrients = (meal['nutrients'] as List<dynamic>?)
-                      ?.map((n) => Nutrition(
-                            nutrientName: n['name'] ?? "",
-                            nutrientValue: (n['amount'] as num?)?.toDouble() ?? 0.0,
-                          ))
-                      .toList() ??
-                  [];
+              List<NutritionModel> nutrients =
+                  (meal['nutrients'] as List<dynamic>?)
+                          ?.map((n) => NutritionModel(
+                                name: n['name'] ?? "",
+                                amount:
+                                    (n['amount'] as num?)?.toDouble() ?? 0.0,
+                              ))
+                          .toList() ??
+                      [];
 
-              List<Ingredient> ingredients =
+              List<IngredientModel> ingredients =
                   (meal['ingredients'] as List<dynamic>?)
-                          ?.map((i) => Ingredient(
+                          ?.map((i) => IngredientModel(
                                 nameEn: i['nameEn'] ?? "",
                                 nameVi: i['nameVi'] ?? "",
                                 quantity:
@@ -162,12 +164,18 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => MealHomeScreen(
-                          meal: Meal(
+                          meal: MealModel(
                             name: name,
                             calories: calories,
                             weight: weight,
                             nutrients: nutrients,
                             ingredients: ingredients,
+                            isFavorite: true,
+                            loggedAt: DateTime.now().toString(),
+                            savedAt: meal['savedAt'] ?? "",
+                            type: meal['type'] ?? "",
+                            userId: meal['userId'] ?? "",
+                            imageUrl: imageUrl,
                           ),
                           imageUrl: imageUrl,
                           isFavorite: true,

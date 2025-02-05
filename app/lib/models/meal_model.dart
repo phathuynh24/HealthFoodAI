@@ -1,83 +1,116 @@
-class Meal {
+import 'package:app/core/firebase/firebase_constants.dart';
+
+class MealModel {
   final String name;
   final double weight;
   final double calories;
-  final List<Nutrition> nutrients;
-  final List<Ingredient> ingredients;
+  final List<NutritionModel> nutrients;
+  final List<IngredientModel> ingredients;
+  final bool isFavorite;
+  final String loggedAt;
+  final String savedAt;
+  final String type;
+  final String userId;
+  final String imageUrl;
 
-  Meal({
+  MealModel({
     required this.name,
     required this.weight,
     required this.calories,
     required this.nutrients,
     required this.ingredients,
+    required this.isFavorite,
+    required this.loggedAt,
+    required this.savedAt,
+    required this.type,
+    required this.userId,
+    required this.imageUrl,
   });
 
-  Map<String, dynamic> toJson() => {
-        "name": name,
-        "weight": weight,
-        "calories": calories,
-        "nutrients": nutrients.map((e) => e.toJson()).toList(),
-        "ingredients": ingredients.map((e) => e.toJson()).toList(),
-      };
-
-  factory Meal.fromJson(Map<String, dynamic> json) => Meal(
-        name: json["name"],
-        weight: json["weight"],
-        calories: json["calories"],
-        nutrients: (json["nutrients"] as List)
-            .map((e) => Nutrition.fromJson(e))
-            .toList(),
-        ingredients: (json["ingredients"] as List)
-            .map((e) => Ingredient.fromJson(e))
-            .toList(),
+  /// Map to Model
+  factory MealModel.fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return MealModel(
+        name: 'Unknown',
+        weight: 0,
+        calories: 0,
+        nutrients: [],
+        ingredients: [],
+        isFavorite: false,
+        loggedAt: '',
+        savedAt: '',
+        type: '',
+        userId: '',
+        imageUrl: '',
       );
+    }
+
+    return MealModel(
+      name: (map[MealFields.customName] as String?)?.isNotEmpty == true
+          ? map[MealFields.customName]
+          : map[MealFields.originalName] ?? 'Unnamed Meal',
+      weight: (map[MealFields.weight] ?? 0).toDouble(),
+      calories: (map[MealFields.calories] ?? 0).toDouble(),
+      nutrients: (map[MealFields.nutrients] as List<dynamic>?)
+              ?.map((item) =>
+                  NutritionModel.fromMap(item as Map<String, dynamic>?))
+              .toList() ??
+          [],
+      ingredients: (map[MealFields.ingredients] as List<dynamic>?)
+              ?.map((item) =>
+                  IngredientModel.fromMap(item as Map<String, dynamic>?))
+              .toList() ??
+          [],
+      isFavorite: map[MealFields.isFavorite] ?? false,
+      loggedAt: map[MealFields.loggedAt] ?? '',
+      savedAt: map[MealFields.savedAt] ?? '',
+      type: map[MealFields.type] ?? '',
+      userId: map[MealFields.userId] ?? '',
+      imageUrl: map[MealFields.imageUrl] ?? '',
+    );
+  }
 }
 
-class Ingredient {
+/// Ingredients Model
+class IngredientModel {
   final String nameEn;
   final String nameVi;
   final double quantity;
   final double calories;
 
-  Ingredient({
+  IngredientModel({
     required this.nameEn,
     required this.nameVi,
     required this.quantity,
     required this.calories,
   });
 
-  Map<String, dynamic> toJson() => {
-        "nameEn": nameEn,
-        "nameVi": nameVi,
-        "quantity": quantity,
-        "calories": calories,
-      };
-
-  factory Ingredient.fromJson(Map<String, dynamic> json) => Ingredient(
-        nameEn: json["nameEn"],
-        nameVi: json["nameVi"],
-        quantity: json["quantity"],
-        calories: json["calories"],
-      );
+  factory IngredientModel.fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return IngredientModel(
+          nameEn: 'Unknown', nameVi: 'Không rõ', quantity: 0, calories: 0);
+    }
+    return IngredientModel(
+      nameEn: map[IngredientFields.nameEn] ?? 'Unknown',
+      nameVi: map[IngredientFields.nameVi] ?? 'Không rõ',
+      quantity: (map[IngredientFields.quantity] ?? 0).toDouble(),
+      calories: (map[IngredientFields.calories] ?? 0).toDouble(),
+    );
+  }
 }
 
-class Nutrition {
-  final String nutrientName;
-  final double nutrientValue;
+/// Nutrition Model
+class NutritionModel {
+  final String name;
+  final double amount;
 
-  Nutrition({
-    required this.nutrientName,
-    required this.nutrientValue,
-  });
+  NutritionModel({required this.name, required this.amount});
 
-  Map<String, dynamic> toJson() => {
-        "nutrientName": nutrientName,
-        "nutrientValue": nutrientValue,
-      };
-
-  factory Nutrition.fromJson(Map<String, dynamic> json) => Nutrition(
-        nutrientName: json["nutrientName"],
-        nutrientValue: json["nutrientValue"],
-      );
+  factory NutritionModel.fromMap(Map<String, dynamic>? map) {
+    if (map == null) return NutritionModel(name: 'Unknown', amount: 0);
+    return NutritionModel(
+      name: map[NutritionFields.name] ?? 'Unknown',
+      amount: (map[NutritionFields.amount] ?? 0).toDouble(),
+    );
+  }
 }

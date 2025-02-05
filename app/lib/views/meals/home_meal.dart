@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:app/core/theme/app_colors.dart';
-import 'package:app/favorite_meals.dart';
+import 'package:app/views/meals/favorite_meals.dart';
 import 'package:app/models/meal_model.dart';
 import 'package:app/widgets/health_rating_widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,11 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class MealHomeScreen extends StatefulWidget {
-  final Meal meal;
+  final MealModel meal;
   final String imageUrl;
   final bool isFavorite;
 
-  MealHomeScreen({required this.meal, required this.imageUrl, this.isFavorite = false});
+  MealHomeScreen(
+      {required this.meal, required this.imageUrl, this.isFavorite = false});
 
   @override
   State<MealHomeScreen> createState() => _MealHomeScreenState();
@@ -28,7 +29,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
   double _serving = 1;
 
   TextEditingController _mealNameController = TextEditingController();
-  late bool isFavorite; 
+  late bool isFavorite;
 
   String _formatServingValue(double serving) {
     if (serving < 1) {
@@ -70,7 +71,6 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
         foregroundColor: Colors.white,
         title: Text('Nutrition Detail'),
         centerTitle: true,
-        
         actions: [
           DropdownButton<String>(
             value: selectedMealType,
@@ -163,8 +163,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                             color: Colors.blue,
                             fontSize: 14,
                             fontStyle: FontStyle.italic,
-                            decorationColor: Colors
-                                .blue,
+                            decorationColor: Colors.blue,
                             decorationThickness: 1,
                           ),
                         ),
@@ -279,8 +278,8 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                                                           "Protein",
                                                           "Total Carbohydrate",
                                                           "Total Fat"
-                                                        ].contains(
-                                                            nutrient.nutrientName))
+                                                        ].contains(nutrient
+                                                            .name))
                                                     .map((nutrient) =>
                                                         _buildFoodItem(
                                                             nutrient))
@@ -370,8 +369,8 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                         ),
                         SizedBox(height: 4),
                         ...widget.meal.nutrients.map(
-                          (nutrient) =>
-                              _buildNutrientRow(nutrient.nutrientName, nutrient.nutrientValue),
+                          (nutrient) => _buildNutrientRow(
+                              nutrient.name, nutrient.amount),
                         ),
                       ],
                     ),
@@ -738,7 +737,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
   }
 }
 
-Widget _buildIngredients(List<Ingredient> ingredients, double serving) {
+Widget _buildIngredients(List<IngredientModel> ingredients, double serving) {
   return Column(
     children: ingredients.map((ingredient) {
       return Row(
@@ -765,7 +764,7 @@ Widget _buildIngredients(List<Ingredient> ingredients, double serving) {
   );
 }
 
-Widget _buildFoodItem(Nutrition nutrient, {bool isAddMore = false}) {
+Widget _buildFoodItem(NutritionModel nutrient, {bool isAddMore = false}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 4.0),
     child: Row(
@@ -773,7 +772,8 @@ Widget _buildFoodItem(Nutrition nutrient, {bool isAddMore = false}) {
         Expanded(
           flex: 2,
           child: TextField(
-            controller: TextEditingController(text: nutrient.nutrientValue.toString()),
+            controller:
+                TextEditingController(text: nutrient.amount.toString()),
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
               border: OutlineInputBorder(),
@@ -785,7 +785,7 @@ Widget _buildFoodItem(Nutrition nutrient, {bool isAddMore = false}) {
         Expanded(
           flex: 5,
           child: TextField(
-            controller: TextEditingController(text: nutrient.nutrientName),
+            controller: TextEditingController(text: nutrient.name),
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               isDense: true,
