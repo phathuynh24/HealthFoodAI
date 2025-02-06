@@ -1,5 +1,6 @@
 import 'package:app/views/exercise/exercise_list_screen.dart';
 import 'package:app/views/exercise/history_exercise.dart';
+import 'package:app/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class DailyWorkoutScreen extends StatefulWidget {
@@ -201,20 +202,7 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
-          appBar: AppBar(
-            foregroundColor: Colors.white,
-            title: Text('Tập luyện tại nhà'),
-            centerTitle: true,
-            flexibleSpace: Container(
-              decoration: const BoxDecoration(
-                // gradient: LinearGradient(
-                //   colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-                //   begin: Alignment.centerLeft,
-                //   end: Alignment.centerRight,
-                // ),
-              ),
-            ),
-          ),
+          appBar: CustomAppBar(title: "Tập luyện tại nhà"),
           body: SingleChildScrollView(
             controller: _scrollController,
             child: Column(
