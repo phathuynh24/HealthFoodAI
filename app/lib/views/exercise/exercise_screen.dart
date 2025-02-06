@@ -159,7 +159,7 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      ExerciseListScreen(),
+                      ExerciseListScreen(filterType: workout['type']!),
                 ),
               ),
               child: Container(
