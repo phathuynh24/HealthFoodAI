@@ -1,6 +1,8 @@
 import "package:app/core/theme/app_colors.dart";
-import "package:app/views/meals/food_scan_screen.dart";
+import "package:app/views/food_recognition/food_scan_screen.dart";
+import "package:app/views/food_suggestions/food_suggest_screen.dart";
 import "package:app/views/home/home_screen.dart";
+import "package:app/views/setting/setting_screen.dart";
 import "package:flutter/material.dart";
 import "package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart";
 
@@ -27,14 +29,15 @@ class MainScreen extends StatelessWidget {
             inactiveForegroundColor: Colors.grey,
           ),
         ),
-        // Recomendation Food Screen
+        // Food Suggest Screen
         PersistentTabConfig(
-          screen: const SafeArea(child: Center(child: Text("Gợi ý món ăn"))),
+          screen: const FoodSuggestScreen(defaultCalories: 1000),
           item: ItemConfig(
             icon: const Icon(Icons.restaurant_menu),
             title: "Món ăn",
             activeForegroundColor: AppColors.activeColor,
             inactiveForegroundColor: Colors.grey,
+            
           ),
         ),
         // Scan Screen
@@ -68,7 +71,7 @@ class MainScreen extends StatelessWidget {
         ),
         // Setting Screen
         PersistentTabConfig(
-          screen: const SafeArea(child: Center(child: Text("⚙️ Cài đặt"))),
+          screen: const SettingScreen(),
           item: ItemConfig(
             icon: const Icon(Icons.settings),
             title: "Cài đặt",

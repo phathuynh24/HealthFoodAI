@@ -72,7 +72,7 @@ def suggest_and_translate_recipes():
             cuisine=cuisine,
             include_ingredients=include_ingredients,
             exclude_ingredients=exclude_ingredients,
-            number=6
+            number=3
         )
 
         if not recipes:

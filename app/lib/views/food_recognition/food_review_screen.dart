@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:app/core/firebase/firebase_constants.dart';
-import 'package:app/views/meals/food_detail_screen.dart';
+import 'package:app/views/food_recognition/food_detail_screen.dart';
 import 'package:app/widgets/custom_snackbar.dart';
 import 'package:app/widgets/loading_indicator.dart';
 import 'package:http/http.dart' as http;
@@ -119,12 +119,14 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
 
     List<NutritionModel> nutrients = [
       NutritionModel(name: "Protein", amount: protein),
-      NutritionModel(name: "Total Carbohydrate", amount: totalCarbs),
-      NutritionModel(name: "Total Fat", amount: totalFat),
+      NutritionModel(name: "Carbohydrate", amount: totalCarbs),
+      NutritionModel(name: "Chất béo", amount: totalFat),
     ];
 
+    List<String> warnings = data[MealFields.warnings]?.cast<String>() ?? [];
+
     _navigateToMealScreen(
-        context, foodName, servingWeight, calories, nutrients, []);
+        context, foodName, servingWeight, calories, nutrients, [], warnings);
   }
 
   void _processGeminiModel(BuildContext context, Map<String, dynamic> data) {
@@ -139,24 +141,31 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
         (totalNutrition[NutritionFields.totalFat] as num?)?.toDouble() ?? 0.0;
 
     var geminiResult = data["gemini_result"];
-    // var englishNameMatch =
-    //     RegExp(r'English:\s*([^,]+)').firstMatch(geminiResult);
     var vietnameseNameMatch =
         RegExp(r'Vietnamese:\s*([^,]+)').firstMatch(geminiResult);
     String dishName = vietnameseNameMatch != null
         ? vietnameseNameMatch.group(1) ?? "Dish"
         : "Dish";
 
+    var detailIngredients = data["total_nutrition"]["detailed_nutrition"];
+    double totalWeight = detailIngredients.fold(0.0, (sum, ingredient) {
+      String quantity = ingredient["quantity"];
+      double weight = double.tryParse(quantity.split(" ")[0]) ?? 0.0;
+      return sum + weight;
+    });
+
     List<NutritionModel> nutrients = [
       NutritionModel(name: "Protein", amount: protein),
-      NutritionModel(name: "Total Carbohydrate", amount: totalCarbs),
-      NutritionModel(name: "Total Fat", amount: totalFat),
+      NutritionModel(name: "Carbohydrate", amount: totalCarbs),
+      NutritionModel(name: "Chất béo", amount: totalFat),
     ];
 
     List<IngredientModel> ingredientsList = _extractIngredients(data);
 
+    List<String> warnings = data[MealFields.warnings]?.cast<String>() ?? [];
+
     _navigateToMealScreen(
-        context, dishName, 0.0, calories, nutrients, ingredientsList);
+        context, dishName, totalWeight, calories, nutrients, ingredientsList, warnings);
   }
 
   List<IngredientModel> _extractIngredients(Map<String, dynamic> data) {
@@ -190,6 +199,7 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
     double calories,
     List<NutritionModel> nutrients,
     List<IngredientModel> ingredients,
+    List<String> warnings,
   ) {
     Navigator.pushAndRemoveUntil(
       context,
@@ -201,13 +211,14 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
             calories: calories,
             nutrients: nutrients,
             ingredients: ingredients,
-            warnings: [],
+            warnings: warnings,
             isFavorite: false,
-            loggedAt: DateTime.now().toString(),
-            savedAt: DateTime.now().toString(),
-            type: "scanned",
-            userId: "user_id",
+            loggedAt: "",
+            savedAt: "",
+            type: "",
+            userId: "",
             imageUrl: widget.image.path,
+            serving: 1,
           ),
           imageUrl: widget.image.path,
         ),

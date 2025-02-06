@@ -13,6 +13,7 @@ class MealModel {
   final String userId;
   final String imageUrl;
   final List<dynamic> warnings;
+  final double serving;
 
   MealModel({
     required this.name,
@@ -27,6 +28,7 @@ class MealModel {
     required this.userId,
     required this.imageUrl,
     required this.warnings,
+    required this.serving,
   });
 
   /// Map to Model
@@ -45,6 +47,7 @@ class MealModel {
         userId: '',
         imageUrl: '',
         warnings: [],
+        serving: 1,
       );
     }
 
@@ -71,6 +74,7 @@ class MealModel {
       userId: map[MealFields.userId] ?? '',
       imageUrl: map[MealFields.imageUrl] ?? '',
       warnings: map[MealFields.warnings] ?? [],
+      serving: (map[MealFields.serving] ?? 1).toDouble(),
     );
   }
 
@@ -88,6 +92,7 @@ class MealModel {
       type: type,
       userId: userId,
       imageUrl: imageUrl,
+      serving: serving,
     );
   }
 }

@@ -43,6 +43,7 @@ class MealFields {
   static const String type = "type";
   static const String userId = "userId";
   static const String imageUrl = "imageUrl";
+  static const String serving = "serving";
 
   // Fields for Food Scan
   static const String description = "description"; // Description of the meal
