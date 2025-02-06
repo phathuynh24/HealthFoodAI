@@ -14,7 +14,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final TextEditingController _fullNameController = TextEditingController();
+  // final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
@@ -28,7 +28,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     .set({
       UserFields.uid: user.uid,
       UserFields.email: user.email,
-      UserFields.fullName: _fullNameController.text.trim(),
+      // UserFields.fullName: _fullNameController.text.trim(),
       UserFields.createdAt: FieldValue.serverTimestamp(),
       UserFields.status: "active",
       UserFields.isFirstLogin: true,
@@ -40,13 +40,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
       UserFields.activityLevel: "",
       UserFields.goal: "",
       UserFields.calories: 0,
+      UserFields.weightChangeRate: 0,
     });
   }
 
   Future<void> _register() async {
     FocusScope.of(context).unfocus();
 
-    if (_fullNameController.text.isEmpty ||
+    if (
+        // _fullNameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _confirmPasswordController.text.isEmpty) {
@@ -115,7 +117,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    _fullNameController.dispose();
+    // _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -148,18 +150,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 50),
 
                       // Name
-                      TextFormField(
-                        controller: _fullNameController,
-                        decoration: InputDecoration(
-                          labelText: 'Họ và Tên',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
+                      // TextFormField(
+                      //   controller: _fullNameController,
+                      //   decoration: InputDecoration(
+                      //     labelText: 'Họ và Tên',
+                      //     border: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(12.0),
+                      //     ),
+                      //     filled: true,
+                      //     fillColor: Colors.white,
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 16),
 
                       // Email
                       TextFormField(

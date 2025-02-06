@@ -26,6 +26,7 @@ class UserFields {
   static const String updatedAt = "updatedAt";
   static const String surveyHistory = "surveyHistory";
   static const String timestamp = "timestamp";
+  static const String weightChangeRate = "weightChangeRate";
 }
 
 /// Fields of Logged Meals

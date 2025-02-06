@@ -1,8 +1,14 @@
 import 'package:app/core/theme/app_theme.dart';
+import 'package:app/views/auth/login_screen.dart';
+import 'package:app/views/setting/edit_goal_screen.dart';
+import 'package:app/widgets/activity_level_picker_bottom_sheet.dart';
+import 'package:app/widgets/custom_picker_bottom_sheet.dart';
+import 'package:app/widgets/weight_picker_bottom_sheet';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({Key? key}) : super(key: key);
@@ -12,63 +18,67 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  // UserProfile? userProfile;
-  bool isLoading = false;
+  bool isLoading = true;
+  Map<String, dynamic>? userData;
+  String appVersion = "";
 
   @override
   void initState() {
     super.initState();
-    // getUserData();
+    _getUserData();
+    _getAppVersion();
   }
 
-  // Future<void> getUserData() async {
-  //   setState(() => isLoading = true);
-  //   try {
-  //     final user = FirebaseAuth.instance.currentUser;
-  //     if (user == null) throw Exception("Người dùng chưa đăng nhập.");
+  Future<void> _getAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      appVersion = "Version ${packageInfo.version}";
+    });
+  }
 
-  //     final firestore = FirebaseFirestore.instance;
-  //     final querySnapshot = await firestore
-  //         .collection('users')
-  //         .where('uid', isEqualTo: user.uid)
-  //         .limit(1)
-  //         .get();
+  Future<void> _getUserData() async {
+    setState(() => isLoading = true);
 
-  //     if (querySnapshot.docs.isEmpty) {
-  //       throw Exception("Không tìm thấy tài liệu người dùng.");
-  //     }
+    try {
+      final user = FirebaseAuth.instance.currentUser;
 
-  //     final userDocId = querySnapshot.docs.first.id;
+      if (user != null) {
+        final docSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
 
-  //     final profileSnapshot = await firestore
-  //         .collection('users')
-  //         .doc(userDocId)
-  //         .collection('health_profiles')
-  //         .doc('main_profile')
-  //         .get();
+        if (docSnapshot.exists) {
+          setState(() {
+            userData = docSnapshot.data();
+            isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Lỗi khi tải dữ liệu người dùng: $e');
+      setState(() => isLoading = false);
+    }
+  }
 
-  //     if (!profileSnapshot.exists) {
-  //       throw Exception("Không tìm thấy thông tin 'main_profile'.");
-  //     }
+  Future<void> _updateUserData(String key, dynamic value) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .update({key: value});
 
-  //     setState(() {
-  //       userProfile =
-  //           UserProfile.fromJson(profileSnapshot.data() as Map<String, dynamic>);
-  //       isLoading = false;
-  //     });
-  //   } catch (e) {
-  //     setState(() => isLoading = false);
-  //     _showSnackBar("Lỗi khi tải dữ liệu: $e", Colors.red);
-  //   }
-  // }
-
-  // void _showSnackBar(String message, Color color) {
-  //   final snackBar = SnackBar(
-  //     content: Text(message),
-  //     backgroundColor: color,
-  //   );
-  //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  // }
+        // Cập nhật trực tiếp giá trị và làm mới UI
+        setState(() {
+          userData?[key] = value;
+        });
+      }
+    } catch (e) {
+      print('Lỗi khi cập nhật dữ liệu: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,61 +106,135 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
-  Widget _buildNoDataMessage() {
-    return const Center(
-      child: Text(
-        "Không tìm thấy thông tin tài khoản.",
-        style: TextStyle(fontSize: 18, color: Colors.red),
-      ),
-    );
-  }
-
   Widget _buildAccountDetails() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // _buildProfileTile(),
           const SizedBox(height: 10),
           _buildFeatureSection(
             items: [
               _buildFeatureItem(
-                icon: CupertinoIcons.folder_solid,
+                icon: CupertinoIcons.person_fill,
                 color: Colors.blue,
-                title: "Hồ sơ sức khỏe",
-                onTap: () {}
+                title: "Giới tính",
+                subtitle: userData?['gender'] == "Male" ? "Nam" : "Nữ",
+                onTap: () {
+                  _showPicker(
+                    context: context,
+                    title: "Chọn Giới Tính",
+                    options: ["Male", "Female"],
+                    currentValue: userData?['gender'] ?? "Male",
+                    onSelected: (value) => _updateUserData('gender', value),
+                    displayValue: (value) => value == "Male" ? "Nam" : "Nữ",
+                  );
+                },
               ),
               _buildFeatureItem(
-                icon: Icons.favorite,
+                icon: Icons.height,
                 color: Colors.red,
-                title: "Danh sách quan tâm",
-                onTap: () {}
+                title: "Chiều cao",
+                subtitle: "${userData?['height'] ?? '--'} cm",
+                onTap: () {
+                  _showPicker(
+                    context: context,
+                    title: "Chọn Chiều Cao",
+                    options: List.generate(
+                        100, (index) => index + 100), // 100-200 cm
+                    currentValue: userData?['height'] ?? 170,
+                    onSelected: (value) => _updateUserData('height', value),
+                    displayValue: (value) => "$value cm",
+                  );
+                },
               ),
               _buildFeatureItem(
-                icon: Icons.add_chart,
+                icon: Icons.cake,
                 color: Colors.indigo,
-                title: "Chỉ số sức khỏe",
-                onTap: () {}
+                title: "Tuổi",
+                subtitle: "${userData?['age'] ?? '--'}",
+                onTap: () {
+                  _showPicker(
+                    context: context,
+                    title: "Chọn Tuổi",
+                    options: List.generate(100, (index) => index + 1),
+                    currentValue: userData?['age'] ?? 25,
+                    onSelected: (value) => _updateUserData('age', value),
+                  );
+                },
               ),
               _buildFeatureItem(
-                icon: Icons.shopping_cart,
+                icon: Icons.monitor_weight,
                 color: Colors.orange,
-                title: "Đơn mua",
-                onTap: () {}
+                title: "Cân nặng",
+                subtitle: "${userData?['weight'] ?? '--'} kg",
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    builder: (_) {
+                      return WeightPickerBottomSheet(
+                        initialWeight: (userData?['weight'] ?? 60).toDouble(),
+                        onSelected: (newWeight) {
+                          setState(() {
+                            userData?['weight'] = newWeight;
+                          });
+                          _updateUserData('weight', newWeight);
+                        },
+                      );
+                    },
+                  );
+                },
               ),
               _buildFeatureItem(
-                icon: Icons.rate_review,
-                color: Colors.yellow,
-                title: "Đánh giá",
-                onTap: () {}
+                icon: Icons.directions_run,
+                color: Colors.green,
+                title: "Hoạt động",
+                subtitle: userData?['activityLevel'] ?? "Không rõ",
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    builder: (context) {
+                      return ActivityLevelPickerBottomSheet(
+                        selectedActivityLevel: userData?['activityLevel'] ??
+                            "Không vận động nhiều",
+                        onSelected: (value) {
+                          _updateUserData('activityLevel', value);
+                        },
+                      );
+                    },
+                  );
+                },
               ),
               _buildFeatureItem(
-                icon: Icons.fitness_center,
-                color: Colors.blueAccent,
-                title: "Tập luyện",
-                onTap: () {},
+                icon: Icons.flag,
+                color: Colors.purple,
+                title: "Mục tiêu",
+                subtitle: userData?['goal'] ?? "Không rõ",
                 showDivider: false,
+                onTap: () async {
+                  final updatedData =
+                      await Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(
+                      builder: (context) => const EditGoalScreen(),
+                    ),
+                  );
+
+                  // Nếu có dữ liệu trả về thì cập nhật lại giao diện
+                  if (updatedData != null && mounted) {
+                    setState(() {
+                      userData = updatedData;
+                    });
+                  }
+                },
               ),
             ],
           ),
@@ -158,42 +242,26 @@ class _SettingScreenState extends State<SettingScreen> {
           _buildFeatureSection(
             items: [
               _buildFeatureItem(
-                icon: Icons.info,
-                color: Colors.deepPurple,
-                title: "Điều khoản và dịch vụ",
-                onTap: () {},
-              ),
-              _buildFeatureItem(
-                icon: CupertinoIcons.person_3_fill,
-                color: Colors.lightGreen,
-                title: "Tham gia cộng đồng",
-                onTap: () {},
-              ),
-              _buildFeatureItem(
-                icon: Icons.share,
-                color: Colors.orange,
-                title: "Chia sẻ ứng dụng",
-                onTap: () {},
-              ),
-              _buildFeatureItem(
-                icon: Icons.contact_support,
-                color: Colors.indigoAccent,
-                title: "Liên hệ và hỗ trợ",
-                onTap: () {},
-              ),
-              _buildFeatureItem(
-                icon: Icons.settings,
-                color: Colors.black54,
-                title: "Cài đặt",
+                icon: Icons.info_outline,
+                color: Colors.grey,
+                title: "Phiên bản",
+                subtitle: appVersion.isNotEmpty ? appVersion : "Đang tải...",
                 onTap: () {},
               ),
               _buildFeatureItem(
                 icon: Icons.logout,
                 color: Colors.redAccent,
                 title: "Đăng xuất",
-                // onTap: () => logOut(context),
-                onTap: () {},
-                showDivider : false,
+                onTap: () async {
+                  await FirebaseAuth.instance.signOut();
+                  if (!mounted) return;
+                  Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()),
+                    (route) => false,
+                  );
+                },
+                showDivider: false,
               ),
             ],
           ),
@@ -203,53 +271,30 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
-  // Widget _buildProfileTile() {
-  //   return GestureDetector(
-  //     onTap: () {
-  //       _navigateTo(
-  //         HealthProfileDetailScreen(profile: userProfile!, isUserOfProfile: true),
-  //       ).then((_) => getUserData());
-  //     },
-  //     child: Container(
-  //       decoration: BoxDecoration(
-  //         color: Colors.white,
-  //         borderRadius: BorderRadius.circular(10),
-  //       ),
-  //       child: ListTile(
-  //         leading: (userProfile!.image.isNotEmpty)
-  //             ? CircleAvatar(
-  //                 radius: 25,
-  //                 backgroundImage: NetworkImage(userProfile!.image),
-  //               )
-  //             : CircleAvatar(
-  //                 radius: 32,
-  //                 backgroundColor: Themes.gradientDeepClr,
-  //                 child: Text(
-  //                   getAbbreviatedName(userProfile!.name),
-  //                   style: const TextStyle(
-  //                     color: Colors.white,
-  //                     fontSize: 24,
-  //                     fontWeight: FontWeight.bold,
-  //                   ),
-  //                 ),
-  //               ),
-  //         title: Text(
-  //           userProfile!.name,
-  //           style: const TextStyle(
-  //             fontWeight: FontWeight.w500,
-  //             fontSize: 15,
-  //           ),
-  //         ),
-  //         subtitle: Text(
-  //           userProfile!.phone.isNotEmpty
-  //               ? userProfile!.phone
-  //               : 'Chưa cập nhật số điện thoại',
-  //           style: const TextStyle(fontSize: 15),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+  void _showPicker<T>({
+    required BuildContext context,
+    required String title,
+    required List<T> options,
+    required T currentValue,
+    required ValueChanged<T> onSelected,
+    String Function(T)? displayValue,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return CustomPickerBottomSheet<T>(
+          title: title,
+          options: options,
+          selectedValue: currentValue,
+          onSelected: onSelected,
+          displayValue: displayValue,
+        );
+      },
+    );
+  }
 
   Widget _buildFeatureSection({required List<Widget> items}) {
     return Container(
@@ -267,6 +312,7 @@ class _SettingScreenState extends State<SettingScreen> {
     required Color color,
     required String title,
     required VoidCallback onTap,
+    String subtitle = "",
     bool showDivider = true,
   }) {
     return Column(
@@ -274,20 +320,27 @@ class _SettingScreenState extends State<SettingScreen> {
         ListTile(
           leading: Icon(icon, color: color, size: 30),
           title: Text(title, style: const TextStyle(fontSize: 15)),
-          trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(subtitle,
+                  style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14)),
+              const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+            ],
+          ),
           onTap: onTap,
         ),
-        if (showDivider) Divider(
-          height: 4,
-          indent: 15,
-          endIndent: 15,
-          color: Colors.grey.shade100,
-        ),
+        if (showDivider)
+          Divider(
+            height: 4,
+            indent: 15,
+            endIndent: 15,
+            color: Colors.grey.shade100,
+          ),
       ],
     );
-  }
-
-  Future<void> _navigateTo(Widget page) async {
-    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
   }
 }

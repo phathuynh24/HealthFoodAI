@@ -18,6 +18,7 @@ class UserModel {
   final Timestamp createdAt;
   final Timestamp updatedAt;
   final List<Map<String, dynamic>> surveyHistory;
+  final double weightChangeRate;
 
   UserModel({
     required this.uid,
@@ -36,6 +37,7 @@ class UserModel {
     required this.createdAt,
     required this.updatedAt,
     required this.surveyHistory,
+    required this.weightChangeRate,
   });
 
   /// Change json from Firestore to UserModel
@@ -57,6 +59,7 @@ class UserModel {
       createdAt: data[UserFields.createdAt] ?? Timestamp.now(),
       updatedAt: data[UserFields.updatedAt] ?? Timestamp.now(),
       surveyHistory: (data[UserFields.surveyHistory] as List<dynamic>?)?.map((e) => e as Map<String, dynamic>).toList() ?? [],
+      weightChangeRate: (data[UserFields.weightChangeRate] ?? 0).toDouble(),
     );
   }
 
@@ -79,6 +82,7 @@ class UserModel {
       UserFields.createdAt: createdAt,
       UserFields.updatedAt: updatedAt,
       UserFields.surveyHistory: surveyHistory,
+      UserFields.weightChangeRate: weightChangeRate,
     };
   }
 }

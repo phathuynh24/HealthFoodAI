@@ -1,12 +1,14 @@
 import 'package:app/core/firebase/firebase_constants.dart';
-import 'package:app/views/user_info_survey/activity_selection_screen.dart';
+import 'package:app/views/user_info_survey/weight_change_rate_screen.dart';
 import 'package:app/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class GoalWeightScreen extends StatefulWidget {
   final Map<String, dynamic> surveyData;
+  final bool isSetting;
 
-  const GoalWeightScreen({Key? key, required this.surveyData})
+  const GoalWeightScreen(
+      {Key? key, required this.surveyData, this.isSetting = false})
       : super(key: key);
 
   @override
@@ -43,12 +45,12 @@ class _GoalWeightScreenState extends State<GoalWeightScreen> {
     double weight = integerPart + (decimalPart / 10);
     Map<String, dynamic> updatedSurveyData = Map.from(widget.surveyData);
     updatedSurveyData[UserFields.targetWeight] = weight;
-    
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
-            ActivitySelectionScreen(surveyData: updatedSurveyData),
+            WeightChangeRateScreen(surveyData: updatedSurveyData, isSetting: widget.isSetting),
       ),
     );
   }

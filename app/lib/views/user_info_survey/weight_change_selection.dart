@@ -1,15 +1,18 @@
 import 'package:app/core/firebase/firebase_constants.dart';
 import 'package:app/views/user_info_survey/current_weight_screen.dart';
+import 'package:app/views/user_info_survey/goal_weight_screen.dart';
 import 'package:app/widgets/custom_app_bar.dart';
 import 'package:app/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 
 class WeightChangeSelectionScreen extends StatefulWidget {
   final Map<String, dynamic> surveyData;
+  final bool isSetting;
 
   const WeightChangeSelectionScreen({
     Key? key,
     required this.surveyData,
+    this.isSetting = false,
   }) : super(key: key);
 
   @override
@@ -27,6 +30,27 @@ class _WeightChangeSelectionScreenState
     selectedGoal = widget.surveyData[UserFields.goal] ?? "";
   }
 
+  void _handleProcessSetting(Map<String, dynamic> updatedSurveyData) async {
+    if (widget.isSetting) {
+      if (updatedSurveyData[UserFields.goal] == "Duy trì cân nặng") {
+        Navigator.pop(context, updatedSurveyData);
+      } else {
+        final updatedData = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                GoalWeightScreen(surveyData: updatedSurveyData, isSetting: widget.isSetting),
+          ),
+        );
+
+        if (updatedData != null && mounted) {
+          Navigator.pop(
+              context, updatedData);
+        }
+      }
+    }
+  }
+
   void _continueToNextScreen() {
     if (selectedGoal.isEmpty) {
       CustomSnackbar.show(context, "Vui lòng chọn mục tiêu!", isSuccess: false);
@@ -36,13 +60,17 @@ class _WeightChangeSelectionScreenState
     Map<String, dynamic> updatedSurveyData = Map.from(widget.surveyData);
     updatedSurveyData[UserFields.goal] = selectedGoal;
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            CurrentWeightScreen(surveyData: updatedSurveyData),
-      ),
-    );
+    if (widget.isSetting) {
+      _handleProcessSetting(updatedSurveyData);
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              CurrentWeightScreen(surveyData: updatedSurveyData),
+        ),
+      );
+    }
   }
 
   @override

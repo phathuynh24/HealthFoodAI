@@ -1,5 +1,5 @@
 import 'package:app/core/firebase/firebase_constants.dart';
-import 'package:app/views/home/home_screen.dart';
+import 'package:app/views/main_screen.dart';
 import 'package:app/widgets/custom_app_bar.dart';
 import 'package:app/widgets/custom_snackbar.dart';
 import 'package:app/widgets/loading_indicator.dart';
@@ -30,8 +30,10 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
 
     final double tdee =
         calculateTDEE(bmr, widget.surveyData[UserFields.activityLevel]);
-    final double adjustedCalories =
-        adjustCalories(tdee, widget.surveyData[UserFields.goal]);
+    final double adjustedCalories = adjustCalories(
+        tdee,
+        widget.surveyData[UserFields.goal],
+        widget.surveyData[UserFields.weightChangeRate]);
 
     return Stack(
       children: [
@@ -97,7 +99,7 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Text(
-                    "📅 Bạn có thể làm lại khảo sát sau 1 tháng để cập nhật mục tiêu và thể trạng của mình.",
+                    "Bạn có thể làm lại khảo sát lại ở mục 'Cài đặt' để cập nhật mục tiêu và thể trạng của mình.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: 14,
@@ -125,6 +127,13 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
                     widget.surveyData[UserFields.activityLevel]),
                 _buildSummaryItem(
                     "Mục tiêu", widget.surveyData[UserFields.goal]),
+
+                if (widget.surveyData[UserFields.weightChangeRate] != null &&
+                    widget.surveyData[UserFields.goal] != "Duy trì cân nặng")
+                  _buildSummaryItem(
+                    "Mức độ ${widget.surveyData[UserFields.goal] == "Giảm cân" ? "giảm" : "tăng"} cân/tuần",
+                    "${widget.surveyData[UserFields.weightChangeRate]} kg/tuần",
+                  ),
 
                 const Spacer(),
 
@@ -185,6 +194,7 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
         UserFields.calories: roundedCalories,
         UserFields.updatedAt: currentTimestamp,
         UserFields.isFirstLogin: false,
+        UserFields.weightChangeRate: widget.surveyData[UserFields.weightChangeRate],
       });
 
       // Save survey history
@@ -206,7 +216,7 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
             isSuccess: true);
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
           (route) => false,
         );
       }
@@ -242,11 +252,24 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
     return bmr * (activityMultipliers[activityLevel] ?? 1.2);
   }
 
-  double adjustCalories(double tdee, String goal) => goal == "Giảm cân"
-      ? tdee - 500
-      : goal == "Tăng cân"
-          ? tdee + 500
-          : tdee;
+  double adjustCalories(double tdee, String goal, double? weightChangeRate) {
+    const caloriesPerKg = 7700; // 1 kg ≈ 7700 calories
+
+    // Tính lượng calo cần thay đổi mỗi ngày
+    double dailyCalorieAdjustment = 0;
+    if (weightChangeRate != null && goal != "Duy trì cân nặng") {
+      dailyCalorieAdjustment = (weightChangeRate * caloriesPerKg) / 7;
+    }
+
+    // Điều chỉnh calo dựa vào mục tiêu
+    if (goal == "Giảm cân") {
+      return tdee - dailyCalorieAdjustment;
+    } else if (goal == "Tăng cân") {
+      return tdee + dailyCalorieAdjustment;
+    } else {
+      return tdee; // Duy trì cân nặng
+    }
+  }
 
   Widget _buildSummaryItem(String title, String value) {
     return Padding(
