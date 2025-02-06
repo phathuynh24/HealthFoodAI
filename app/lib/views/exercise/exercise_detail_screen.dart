@@ -1,5 +1,6 @@
 import 'package:app/core/theme/app_theme.dart';
 import 'package:app/models/exercise_model.dart';
+import 'package:app/views/exercise/exercise_bottom_sheet.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -210,6 +211,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           IconButton(
             icon: const Icon(Icons.video_library_rounded),
             onPressed: () {
+              showExerciseDetailBottomSheet(
+                context,
+                widget.exercise,
+              );
             },
           ),
         ],
