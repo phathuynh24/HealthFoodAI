@@ -21,6 +21,8 @@ dependencies:
   persistent_bottom_nav_bar_v2: ^5.3.1
   package_info_plus: ^8.2.0
   syncfusion_flutter_charts: ^27.2.5
+  table_calendar: ^3.1.3
+  youtube_player_flutter: ^9.1.1
 
 dev_dependencies:
   flutter_test:
@@ -39,3 +41,59 @@ flutter:
     - assets/dish_icon.png
     - assets/empty_glass.png
     - assets/glass.png
+    - assets/plank.gif
+    - assets/planking.gif
+    - assets/airbike.gif
+    - assets/side-plank.gif
+    - assets/dead_fish.gif
+    - assets/crunch.gif
+    - assets/big_cats.gif
+    - assets/full_twist.gif
+    - assets/leg_raise.gif
+    - assets/crunch_scissor.gif
+    - assets/power_boat.gif
+    - assets/raise_bike.gif
+    - assets/prone_knee.gif
+    - assets/pushup_1.gif
+    - assets/pushup_2.gif
+    - assets/dumbbell_press.gif
+    - assets/deck_fly.gif
+    - assets/pull_over.gif
+    - assets/barbell_bench.gif
+    - assets/dumbbell.gif
+    - assets/cable_fly.gif
+    - assets/DBCurl.gif
+    - assets/diamond_push.gif
+    - assets/hammercurl.gif
+    - assets/seatcurl.gif
+    - assets/benchdip.gif
+    - assets/dip.gif
+    - assets/tricep_rope_pulldown.gif
+    - assets/dumbelllie.gif
+    - assets/cable_curl.gif
+    - assets/stride_tubing.gif
+    - assets/kickback.gif
+    - assets/bd_squat.gif
+    - assets/calf_band.gif
+    - assets/lunge.gif
+    - assets/split_squat.gif
+    - assets/adductor.gif
+    - assets/stationary.gif
+    - assets/hip.gif
+    - assets/sumo.gif
+    - assets/kneeling.gif
+    - assets/squat.gif
+    - assets/leg_press.gif
+    - assets/calf_raise.gif
+    - assets/abs1.jpg
+    - assets/abs2.jpg
+    - assets/abs3.jpg
+    - assets/chest1.jpg
+    - assets/chest2.jpg
+    - assets/chest3.jpg
+    - assets/arm1.jpg
+    - assets/arm2.jpg
+    - assets/arm3.jpg
+    - assets/leg1.jpg
+    - assets/leg2.jpg
+    - assets/leg3.jpg
