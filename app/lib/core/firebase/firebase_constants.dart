@@ -1,8 +1,10 @@
 class FirebaseConstants {
   /// Collection: Users
   static const String usersCollection = "users";
+
   /// Collection: Logged Meals
   static const String loggedMealsCollection = "logged_meals";
+
   /// Collection: Favorite Meals
   static const String favoriteMealsCollection = "favorite_meals";
 }
@@ -27,6 +29,9 @@ class UserFields {
   static const String surveyHistory = "surveyHistory";
   static const String timestamp = "timestamp";
   static const String weightChangeRate = "weightChangeRate";
+  static const String weightHistory = "weightHistory";
+  static const String weightHistoryDate = "date";
+  static const String weightHistoryValue = "value";
 }
 
 /// Fields of Logged Meals
@@ -49,9 +54,11 @@ class MealFields {
   // Fields for Food Scan
   static const String description = "description"; // Description of the meal
   static const String bloodSugar = "blood_sugar"; // Đường huyết
-  static const String bloodPressure = "blood_pressure"; // Huyết áp (JSON: systolic, diastolic)
+  static const String bloodPressure =
+      "blood_pressure"; // Huyết áp (JSON: systolic, diastolic)
   static const String predictedName = "name"; // Name of the meal
-  static const String servingWeight = "serving_weight_grams"; // Weight of the meal
+  static const String servingWeight =
+      "serving_weight_grams"; // Weight of the meal
 }
 
 /// Fields of Nutrients

@@ -20,6 +20,7 @@ dependencies:
   firebase_core: ^3.10.1
   persistent_bottom_nav_bar_v2: ^5.3.1
   package_info_plus: ^8.2.0
+  syncfusion_flutter_charts: ^27.2.5
 
 dev_dependencies:
   flutter_test:

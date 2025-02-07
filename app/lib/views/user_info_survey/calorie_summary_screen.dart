@@ -1,3 +1,4 @@
+import 'package:app/core/calorie_calculator/calorie_calculator.dart';
 import 'package:app/core/firebase/firebase_constants.dart';
 import 'package:app/views/main_screen.dart';
 import 'package:app/widgets/custom_app_bar.dart';
@@ -6,6 +7,7 @@ import 'package:app/widgets/loading_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CalorieSummaryScreen extends StatefulWidget {
   final Map<String, dynamic> surveyData;
@@ -21,19 +23,15 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double bmr = calculateBMR(
-      widget.surveyData[UserFields.gender],
-      widget.surveyData[UserFields.weight],
-      widget.surveyData[UserFields.height],
-      widget.surveyData[UserFields.age],
+    final double adjustedCalories = CalorieCalculator.calculateDailyCalories(
+      gender: widget.surveyData[UserFields.gender],
+      weight: widget.surveyData[UserFields.weight],
+      height: widget.surveyData[UserFields.height],
+      age: widget.surveyData[UserFields.age],
+      activityLevel: widget.surveyData[UserFields.activityLevel],
+      goal: widget.surveyData[UserFields.goal],
+      weightChangeRate: widget.surveyData[UserFields.weightChangeRate],
     );
-
-    final double tdee =
-        calculateTDEE(bmr, widget.surveyData[UserFields.activityLevel]);
-    final double adjustedCalories = adjustCalories(
-        tdee,
-        widget.surveyData[UserFields.goal],
-        widget.surveyData[UserFields.weightChangeRate]);
 
     return Stack(
       children: [
@@ -89,52 +87,6 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
-
-                // Time to Re-survey
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.greenAccent[100],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    "Bạn có thể làm lại khảo sát lại ở mục 'Cài đặt' để cập nhật mục tiêu và thể trạng của mình.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Info Summary
-                _buildSummaryItem(
-                    "Giới tính",
-                    widget.surveyData[UserFields.gender] == "Male"
-                        ? "Nam"
-                        : "Nữ"),
-                _buildSummaryItem(
-                    "Tuổi", widget.surveyData[UserFields.age].toString()),
-                _buildSummaryItem(
-                    "Chiều cao", "${widget.surveyData[UserFields.height]} cm"),
-                _buildSummaryItem("Cân nặng hiện tại",
-                    "${widget.surveyData[UserFields.weight]} kg"),
-                _buildSummaryItem("Cân nặng mục tiêu",
-                    "${widget.surveyData[UserFields.targetWeight]} kg"),
-                _buildSummaryItem("Mức độ vận động",
-                    widget.surveyData[UserFields.activityLevel]),
-                _buildSummaryItem(
-                    "Mục tiêu", widget.surveyData[UserFields.goal]),
-
-                if (widget.surveyData[UserFields.weightChangeRate] != null &&
-                    widget.surveyData[UserFields.goal] != "Duy trì cân nặng")
-                  _buildSummaryItem(
-                    "Mức độ ${widget.surveyData[UserFields.goal] == "Giảm cân" ? "giảm" : "tăng"} cân/tuần",
-                    "${widget.surveyData[UserFields.weightChangeRate]} kg/tuần",
-                  ),
-
                 const Spacer(),
 
                 // Save & Finish Button
@@ -167,7 +119,6 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
     );
   }
 
-  // Save Survey Data
   Future<void> _saveSurveyData(
       BuildContext context, double adjustedCalories) async {
     setState(() {
@@ -179,7 +130,7 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
       Timestamp currentTimestamp = Timestamp.now();
       int roundedCalories = adjustedCalories.round();
 
-      // Update main user data
+      // Cập nhật thông tin chính của người dùng
       await FirebaseFirestore.instance
           .collection(FirebaseConstants.usersCollection)
           .doc(uid)
@@ -194,23 +145,42 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
         UserFields.calories: roundedCalories,
         UserFields.updatedAt: currentTimestamp,
         UserFields.isFirstLogin: false,
-        UserFields.weightChangeRate: widget.surveyData[UserFields.weightChangeRate],
+        UserFields.weightChangeRate:
+            widget.surveyData[UserFields.weightChangeRate],
       });
 
-      // Save survey history
-      await FirebaseFirestore.instance
-          .collection(FirebaseConstants.usersCollection)
-          .doc(uid)
-          .update({
-        UserFields.surveyHistory: FieldValue.arrayUnion([
-          {
-            UserFields.timestamp: currentTimestamp,
-            ...widget.surveyData,
-            UserFields.calories: adjustedCalories,
-          }
-        ])
+      // Lưu lịch sử khảo sát
+      DateTime now = DateTime.now();
+      String dateKey = DateFormat('dd-MM-yyyy').format(now);
+
+      // Lấy lịch sử khảo sát hiện tại
+      DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      List<dynamic> surveyHistory = userDoc[UserFields.surveyHistory] ?? [];
+
+      // Kiểm tra xem đã có dữ liệu cho ngày hiện tại chưa
+      int existingIndex = surveyHistory.indexWhere(
+        (entry) => entry['date'] == dateKey,
+      );
+
+      if (existingIndex != -1) {
+        surveyHistory[existingIndex]['calories'] = roundedCalories;
+        surveyHistory[existingIndex]['timestamp'] = currentTimestamp;
+      } else {
+        surveyHistory.add({
+          'date': dateKey,
+          'calories': roundedCalories,
+          'timestamp': currentTimestamp,
+        });
+      }
+
+      // Lưu lại dữ liệu lịch sử khảo sát đã cập nhật
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'surveyHistory': surveyHistory,
       });
 
+      // Hiển thị thông báo thành công
       if (context.mounted) {
         CustomSnackbar.show(context, "Lưu thông tin thành công!",
             isSuccess: true);
@@ -231,58 +201,5 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
         });
       }
     }
-  }
-
-  // Calculate BMR
-  double calculateBMR(String gender, double weight, int height, int age) {
-    return gender == "Male"
-        ? 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
-        : 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
-  }
-
-  // Calculate TDEE
-  double calculateTDEE(double bmr, String activityLevel) {
-    const activityMultipliers = {
-      "Không vận động nhiều": 1.2,
-      "Hơi vận động": 1.375,
-      "Vận động vừa phải": 1.55,
-      "Vận động nhiều": 1.725,
-      "Vận động rất nhiều": 1.9
-    };
-    return bmr * (activityMultipliers[activityLevel] ?? 1.2);
-  }
-
-  double adjustCalories(double tdee, String goal, double? weightChangeRate) {
-    const caloriesPerKg = 7700; // 1 kg ≈ 7700 calories
-
-    // Tính lượng calo cần thay đổi mỗi ngày
-    double dailyCalorieAdjustment = 0;
-    if (weightChangeRate != null && goal != "Duy trì cân nặng") {
-      dailyCalorieAdjustment = (weightChangeRate * caloriesPerKg) / 7;
-    }
-
-    // Điều chỉnh calo dựa vào mục tiêu
-    if (goal == "Giảm cân") {
-      return tdee - dailyCalorieAdjustment;
-    } else if (goal == "Tăng cân") {
-      return tdee + dailyCalorieAdjustment;
-    } else {
-      return tdee; // Duy trì cân nặng
-    }
-  }
-
-  Widget _buildSummaryItem(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title, style: const TextStyle(fontSize: 16)),
-          Text(value,
-              style:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
   }
 }

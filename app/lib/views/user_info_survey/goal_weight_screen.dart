@@ -42,16 +42,53 @@ class _GoalWeightScreenState extends State<GoalWeightScreen> {
   }
 
   void _continueToNextScreen() {
-    double weight = integerPart + (decimalPart / 10);
+    double targetWeight = integerPart + (decimalPart / 10);
+    double currentWeight = widget.surveyData[UserFields.weight] ?? 70.0;
+    String goal = widget.surveyData[UserFields.goal] ?? "Duy trì cân nặng";
+
+    // Kiểm tra điều kiện hợp lệ
+    if ((goal == "Tăng cân" && targetWeight <= currentWeight) ||
+        (goal == "Giảm cân" && targetWeight >= currentWeight)) {
+      _showErrorDialog(goal);
+      return; // Không cho phép tiếp tục nếu không hợp lệ
+    }
+
+    // Nếu hợp lệ, tiếp tục lưu dữ liệu
     Map<String, dynamic> updatedSurveyData = Map.from(widget.surveyData);
-    updatedSurveyData[UserFields.targetWeight] = weight;
+    updatedSurveyData[UserFields.targetWeight] = targetWeight;
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            WeightChangeRateScreen(surveyData: updatedSurveyData, isSetting: widget.isSetting),
+        builder: (context) => WeightChangeRateScreen(
+          surveyData: updatedSurveyData,
+          isSetting: widget.isSetting,
+        ),
       ),
+    );
+  }
+
+  // Hiển thị cảnh báo lỗi
+  void _showErrorDialog(String goal) {
+    String message = goal == "Tăng cân"
+        ? "Cân nặng mục tiêu phải lớn hơn cân nặng hiện tại để đạt mục tiêu tăng cân."
+        : "Cân nặng mục tiêu phải nhỏ hơn cân nặng hiện tại để đạt mục tiêu giảm cân.";
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Cảnh báo",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Text(message, style: const TextStyle(fontSize: 16)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Đã hiểu"),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -149,7 +186,7 @@ class _GoalWeightScreenState extends State<GoalWeightScreen> {
                           );
                         },
                         childCount:
-                            10, // Decimal part from 0 to 9 (0.0 to 0.9 kg
+                            10, // Decimal part from 0 to 9 (0.0 to 0.9 kg)
                       ),
                     ),
                   ),

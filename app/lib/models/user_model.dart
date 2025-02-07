@@ -13,12 +13,13 @@ class UserModel {
   final String activityLevel;
   final String goal;
   final double calories;
+  final double weightChangeRate;
   final bool isFirstLogin;
   final String status;
   final Timestamp createdAt;
   final Timestamp updatedAt;
   final List<Map<String, dynamic>> surveyHistory;
-  final double weightChangeRate;
+  final List<Map<String, dynamic>> weightHistory;
 
   UserModel({
     required this.uid,
@@ -38,9 +39,9 @@ class UserModel {
     required this.updatedAt,
     required this.surveyHistory,
     required this.weightChangeRate,
+    required this.weightHistory,
   });
 
-  /// Change json from Firestore to UserModel
   factory UserModel.fromMap(Map<String, dynamic> data) {
     return UserModel(
       uid: data[UserFields.uid] ?? '',
@@ -58,12 +59,18 @@ class UserModel {
       status: data[UserFields.status] ?? 'active',
       createdAt: data[UserFields.createdAt] ?? Timestamp.now(),
       updatedAt: data[UserFields.updatedAt] ?? Timestamp.now(),
-      surveyHistory: (data[UserFields.surveyHistory] as List<dynamic>?)?.map((e) => e as Map<String, dynamic>).toList() ?? [],
+      surveyHistory: (data[UserFields.surveyHistory] as List<dynamic>?)
+              ?.map((e) => e as Map<String, dynamic>)
+              .toList() ??
+          [],
       weightChangeRate: (data[UserFields.weightChangeRate] ?? 0).toDouble(),
+      weightHistory: (data[UserFields.weightHistory] as List<dynamic>?)
+              ?.map((e) => e as Map<String, dynamic>)
+              .toList() ??
+          [],
     );
   }
 
-  /// Change UserModel to json for Firestore
   Map<String, dynamic> toMap() {
     return {
       UserFields.uid: uid,
@@ -83,6 +90,7 @@ class UserModel {
       UserFields.updatedAt: updatedAt,
       UserFields.surveyHistory: surveyHistory,
       UserFields.weightChangeRate: weightChangeRate,
+      UserFields.weightHistory: weightHistory,
     };
   }
 }

@@ -2,7 +2,7 @@ import 'package:app/core/firebase/firebase_constants.dart';
 import 'package:app/views/user_info_survey/weight_change_selection.dart';
 import 'package:app/widgets/custom_app_bar.dart';
 import 'package:app/widgets/goal_item.dart';
-import 'package:app/widgets/weight_picker_bottom_sheet';
+import 'package:app/widgets/weight_picker_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -105,25 +105,25 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
                       title: "Cân nặng hiện tại",
                       value: "${userData?['weight'] ?? '--'} kg",
                       onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(20)),
-                          ),
-                          builder: (_) {
-                            return WeightPickerBottomSheet(
-                              initialWeight:
-                                  (userData?['weight'] ?? 60).toDouble(),
-                              onSelected: (newWeight) {
-                                setState(() {
-                                  userData?['weight'] = newWeight;
-                                });
-                                _updateUserData('weight', newWeight);
-                              },
-                            );
-                          },
-                        );
+                        // showModalBottomSheet(
+                        //   context: context,
+                        //   shape: const RoundedRectangleBorder(
+                        //     borderRadius:
+                        //         BorderRadius.vertical(top: Radius.circular(20)),
+                        //   ),
+                        //   builder: (_) {
+                        //     return WeightPickerBottomSheet(
+                        //       initialWeight:
+                        //           (userData?['weight'] ?? 60).toDouble(),
+                        //       onSelected: (newWeight) {
+                        //         setState(() {
+                        //           userData?['weight'] = newWeight;
+                        //         });
+                        //         _updateUserData('weight', newWeight);
+                        //       },
+                        //     );
+                        //   },
+                        // );
                       },
                       valueColor: Colors.deepOrange,
                     ),
@@ -199,8 +199,8 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
                     color: valueColor,
                   ),
                 ),
-                const Icon(Icons.arrow_forward_ios,
-                    size: 16, color: Colors.grey),
+                // const Icon(Icons.arrow_forward_ios,
+                //     size: 16, color: Colors.grey),
               ],
             ),
           ],
