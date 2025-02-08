@@ -1,9 +1,12 @@
+import 'package:app/core/theme/app_colors.dart';
 import 'package:app/views/exercise/exercise_list_screen.dart';
-import 'package:app/views/exercise/history_exercise.dart';
+import 'package:app/views/exercise/history_exercise_screen.dart';
 import 'package:app/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class DailyWorkoutScreen extends StatefulWidget {
+  const DailyWorkoutScreen({super.key});
+
   @override
   State<DailyWorkoutScreen> createState() => _DailyWorkoutScreenState();
 }
@@ -102,40 +105,6 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
     },
   ];
 
-  final GlobalKey beginnerKey = GlobalKey();
-  final GlobalKey intermediateKey = GlobalKey();
-  final GlobalKey advancedKey = GlobalKey();
-
-  late ScrollController _scrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void scrollToSection(GlobalKey key) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final context = key.currentContext;
-      if (context != null) {
-        final box = context.findRenderObject() as RenderBox;
-        final offset =
-            box.localToGlobal(Offset.zero).dy + _scrollController.offset;
-        _scrollController.animateTo(
-          offset,
-          duration: const Duration(milliseconds: 2),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
-  }
-
   Widget buildWorkoutSection(
       String header, List<Map<String, String>> workouts) {
     return Column(
@@ -145,18 +114,18 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
           padding: const EdgeInsets.all(8),
           child: Text(
             header,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
         ),
         ListView.builder(
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: workouts.length,
           itemBuilder: (context, index) {
             final workout = workouts[index];
             return GestureDetector(
-              onTap: () => Navigator.push(
-                context,
+              onTap: () => Navigator.of(context, rootNavigator: true).push(
                 MaterialPageRoute(
                   builder: (context) =>
                       ExerciseListScreen(filterType: workout['type']!),
@@ -170,22 +139,53 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
                   image: DecorationImage(
                     image: AssetImage(workout['image']!),
                     fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.black
+                          .withOpacity(0.3), // Tạo lớp phủ nhẹ để chữ rõ hơn
+                      BlendMode.darken,
+                    ),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       workout['title']!,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.white),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 6,
+                            color: Colors.black54,
+                            offset: Offset(2, 2),
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       '${workout['time']} • ${workout['exercises']}',
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 4,
+                            color: Colors.black45,
+                            offset: Offset(1, 1),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -199,201 +199,116 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          appBar: CustomAppBar(title: "Tập luyện tại nhà"),
-          body: SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(16),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => HistoryExercise()));
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Mục tiêu hàng tuần: ${DateTime.now().month}/${DateTime.now().year}',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: List.generate(7, (index) {
-                            DateTime today = DateTime.now(); // Lấy ngày hôm nay
-                            DateTime day = today.add(Duration(
-                                days: index -
-                                    3)); // Tính toán các ngày để hôm nay ở giữa
-                            bool isToday = day.day == today.day &&
-                                day.month == today.month &&
-                                day.year ==
-                                    today.year; // Kiểm tra nếu là ngày hôm nay
+    DateTime today = DateTime.now();
+    int currentMonth = today.month;
+    int currentYear = today.year;
+    int daysInMonth = DateTime(currentYear, currentMonth + 1, 0).day;
 
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 8),
-                              decoration: BoxDecoration(
-                                color:
-                                    isToday ? Colors.blue : Colors.transparent,
-                                borderRadius: BorderRadius.circular(90),
-                              ),
-                              child: Text(
-                                '${day.day}', // Hiển thị ngày
-                                style: TextStyle(
-                                  color: isToday ? Colors.white : Colors.black,
-                                ),
-                              ),
-                            );
-                          }),
-                        ),
-                      ],
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: const CustomAppBar(title: "Tập luyện tại nhà"),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Lịch sử tập trong tháng $currentMonth/$currentYear',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
-                ),
-                Divider(),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'THỬ THÁCH 7x4',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'TOÀN THÂN THỬ THÁCH 7x4',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.white,
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 50,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: daysInMonth,
+                        itemBuilder: (context, index) {
+                          DateTime day =
+                              DateTime(currentYear, currentMonth, index + 1);
+                          bool isToday = day.day == today.day &&
+                              day.month == today.month &&
+                              day.year == today.year;
+                          bool isFuture = day.isAfter(today);
+
+                          return GestureDetector(
+                            onTap: isFuture
+                                ? null
+                                : () {
+                                    Navigator.of(context, rootNavigator: true)
+                                        .push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            HistoryExerciseScreen(
+                                                initialDate: day),
+                                      ),
+                                    );
+                                  },
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 6),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 14),
+                              decoration: BoxDecoration(
+                                color: isToday
+                                    ? Colors.blue
+                                    : isFuture
+                                        ? Colors.grey.shade300
+                                        : Colors.transparent,
+                                borderRadius: BorderRadius.circular(50),
+                                border: isToday
+                                    ? Border.all(
+                                        color: Colors.blueAccent, width: 2)
+                                    : Border.all(color: Colors.grey.shade400),
                               ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Bắt đầu hành trình tạo dáng cơ thể để tập trung vào tất cả các nhóm cơ và xây dựng cơ thể mơ ước của bạn trong 4 tuần!',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                              ),
-                              child: Text(
-                                'KHỞI ĐẦU',
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(),
-                // Beginner Section
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          GestureDetector(
-                            onTap: () => scrollToSection(beginnerKey),
-                            child: Expanded(
-                              child: Text(
-                                'Người bắt đầu',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.blue,
+                              child: Center(
+                                child: Text(
+                                  '${day.day}',
+                                  style: TextStyle(
+                                    color: isToday
+                                        ? Colors.white
+                                        : isFuture
+                                            ? Colors.grey
+                                            : Colors.black,
+                                    fontWeight: isToday
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          GestureDetector(
-                            onTap: () => scrollToSection(intermediateKey),
-                            child: Expanded(
-                              child: Text(
-                                'Trung bình',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => scrollToSection(advancedKey),
-                            child: Expanded(
-                              child: Text(
-                                'Nâng cao',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                      SizedBox(height: 16),
-                      Column(
-                        key: beginnerKey,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          buildWorkoutSection(
-                              'Người Bắt Đầu', beginnerWorkouts),
-                        ],
-                      ),
-                      // Intermediate Section
-                      Column(
-                        key: intermediateKey,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          buildWorkoutSection(
-                              'Trung Bình', intermediateWorkouts),
-                        ],
-                      ),
-                      // Advanced Section
-                      Column(
-                        key: advancedKey,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          buildWorkoutSection('Nâng Cao', advancedWorkouts),
-                        ],
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const Divider(),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    buildWorkoutSection('Người Bắt Đầu', beginnerWorkouts),
+                    const SizedBox(height: 16),
+                    buildWorkoutSection('Trung Bình', intermediateWorkouts),
+                    const SizedBox(height: 16),
+                    buildWorkoutSection('Nâng Cao', advancedWorkouts),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 90),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

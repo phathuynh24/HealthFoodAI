@@ -152,14 +152,18 @@ class _AddWeightScreenState extends State<AddWeightScreen> {
       'weight': weight,
       'calories': calories,
       'updatedAt': Timestamp.now(),
-      if (!isMaintaining) 'targetWeight': 0,
+      if (!isMaintaining) 'targetWeight': 0.0,
     };
+
+    debugPrint('isMaintaining: $isMaintaining');
 
     if (isMaintaining) {
       updateData['goal'] = 'Duy trì cân nặng';
       updateData['weightChangeRate'] = 0; // Không thay đổi cân nặng khi duy trì
       updateData['targetWeight'] = weight; // Mục tiêu cân nặng mới
     }
+
+    debugPrint('updateData: $updateData');
 
     await docRef.update(updateData);
   }
@@ -178,7 +182,6 @@ class _AddWeightScreenState extends State<AddWeightScreen> {
         final docRef = FirebaseFirestore.instance.collection('users').doc(uid);
         final docSnapshot = await docRef.get();
         final userData = docSnapshot.data() ?? {};
-
         final weightHistory = (userData['weightHistory'] ?? []) as List;
         final targetWeight = (userData['targetWeight'] ?? 0).toDouble();
         final goal = userData['goal'];
@@ -206,7 +209,7 @@ class _AddWeightScreenState extends State<AddWeightScreen> {
 
         // 4️⃣ Kiểm tra xem đã đạt mục tiêu chưa
         final hasReachedTarget = _hasReachedTarget(_weight, targetWeight, goal);
-
+        debugPrint('kkkk');
         // 5️⃣ Tính toán lại calo với CalorieCalculator
         final dailyCalories = CalorieCalculator.calculateDailyCalories(
           gender: userData['gender'],
@@ -215,9 +218,10 @@ class _AddWeightScreenState extends State<AddWeightScreen> {
           age: userData['age'],
           activityLevel: userData['activityLevel'],
           goal: hasReachedTarget ? 'Duy trì cân nặng' : goal,
-          weightChangeRate: hasReachedTarget ? 0 : userData['weightChangeRate'],
+          weightChangeRate: hasReachedTarget
+              ? 0.0
+              : (userData['weightChangeRate'] as num).toDouble(),
         );
-
         // 6️⃣ Cập nhật dữ liệu người dùng
         await _updateUserData(uid, _weight, dailyCalories, goal,
             isMaintaining: hasReachedTarget);

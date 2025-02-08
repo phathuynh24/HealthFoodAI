@@ -125,8 +125,10 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
 
     List<String> warnings = data[MealFields.warnings]?.cast<String>() ?? [];
 
+    String id = data["id"] ?? "";
+
     _navigateToMealScreen(
-        context, foodName, servingWeight, calories, nutrients, [], warnings);
+        context, id, foodName, servingWeight, calories, nutrients, [], warnings);
   }
 
   void _processGeminiModel(BuildContext context, Map<String, dynamic> data) {
@@ -164,8 +166,10 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
 
     List<String> warnings = data[MealFields.warnings]?.cast<String>() ?? [];
 
+    String id = data["id"] ?? "";
+
     _navigateToMealScreen(
-        context, dishName, totalWeight, calories, nutrients, ingredientsList, warnings);
+        context, id, dishName, totalWeight, calories, nutrients, ingredientsList, warnings);
   }
 
   List<IngredientModel> _extractIngredients(Map<String, dynamic> data) {
@@ -194,6 +198,7 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
 
   void _navigateToMealScreen(
     BuildContext context,
+    String id,
     String dishName,
     double servingWeight,
     double calories,
@@ -206,6 +211,7 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
       MaterialPageRoute(
         builder: (context) => FoodDetailScreen(
           meal: MealModel(
+            id: "",
             name: dishName,
             weight: servingWeight,
             calories: calories,
@@ -407,34 +413,34 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    /// Health Info Button
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () => _showHealthInfoSheet(context),
-                        icon: Icon(
-                          isHealthInfoEntered
-                              ? Icons.check_circle
-                              : Icons.health_and_safety,
-                          color:
-                              isHealthInfoEntered ? Colors.green : Colors.blue,
-                        ),
-                        label: Text(
-                          isHealthInfoEntered
-                              ? "Đã nhập chỉ số"
-                              : "Nhập chỉ số",
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: const BorderSide(color: Colors.blue),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
+                    // /// Health Info Button
+                    // Expanded(
+                    //   child: ElevatedButton.icon(
+                    //     onPressed: () => _showHealthInfoSheet(context),
+                    //     icon: Icon(
+                    //       isHealthInfoEntered
+                    //           ? Icons.check_circle
+                    //           : Icons.health_and_safety,
+                    //       color:
+                    //           isHealthInfoEntered ? Colors.green : Colors.blue,
+                    //     ),
+                    //     label: Text(
+                    //       isHealthInfoEntered
+                    //           ? "Đã nhập chỉ số"
+                    //           : "Nhập chỉ số",
+                    //     ),
+                    //     style: ElevatedButton.styleFrom(
+                    //       padding: const EdgeInsets.symmetric(vertical: 18),
+                    //       backgroundColor: Colors.white,
+                    //       foregroundColor: Colors.black,
+                    //       shape: RoundedRectangleBorder(
+                    //         borderRadius: BorderRadius.circular(12),
+                    //         side: const BorderSide(color: Colors.blue),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    // const SizedBox(width: 10),
 
                     /// Upload Button
                     Expanded(

@@ -1,4 +1,6 @@
 import 'package:app/core/calorie_calculator/calorie_calculator.dart';
+import 'package:app/core/events/calo_update_event.dart';
+import 'package:app/core/events/event_bus.dart';
 import 'package:app/core/theme/app_theme.dart';
 import 'package:app/models/weight_model.dart';
 import 'package:app/views/auth/login_screen.dart';
@@ -159,6 +161,8 @@ class _SettingScreenState extends State<SettingScreen> {
       setState(() {
         userData?['calories'] = newCalories.round();
       });
+
+      eventBus.fire(CaloUpdateEvent(newCalories.round()));
 
       debugPrint('Đã tính lại calo: $newCalories');
     } catch (e) {

@@ -36,6 +36,7 @@ class UserFields {
 
 /// Fields of Logged Meals
 class MealFields {
+  static const String id = "id";
   static const String customName = "customName";
   static const String originalName = "originalName";
   static const String weight = "weight";

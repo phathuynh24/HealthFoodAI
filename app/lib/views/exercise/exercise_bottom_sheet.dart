@@ -96,47 +96,47 @@ void showExerciseDetailBottomSheet(BuildContext context, Exercise exercise) {
                       ),
                     ),
                     // Duration adjustment section
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'THỜI GIAN',
-                            style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.blue,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.remove),
-                                onPressed: () {
-                                  setState(() {
-                                    if (updatedTime > 10) {
-                                      updatedTime -= 10; // Giảm 10 giây
-                                    }
-                                  });
-                                },
-                              ),
-                              Text(
-                                '${(updatedTime ~/ 60).toString().padLeft(2, '0')}:${(updatedTime % 60).toString().padLeft(2, '0')}',
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.add),
-                                onPressed: () {
-                                  setState(() {
-                                    updatedTime += 10; // Tăng 10 giây
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       const Text(
+                    //         'THỜI GIAN',
+                    //         style: TextStyle(
+                    //             fontSize: 20,
+                    //             color: Colors.blue,
+                    //             fontWeight: FontWeight.bold),
+                    //       ),
+                    //       Row(
+                    //         children: [
+                    //           IconButton(
+                    //             icon: const Icon(Icons.remove),
+                    //             onPressed: () {
+                    //               setState(() {
+                    //                 if (updatedTime > 10) {
+                    //                   updatedTime -= 10; // Giảm 10 giây
+                    //                 }
+                    //               });
+                    //             },
+                    //           ),
+                    //           Text(
+                    //             '${(updatedTime ~/ 60).toString().padLeft(2, '0')}:${(updatedTime % 60).toString().padLeft(2, '0')}',
+                    //             style: const TextStyle(fontSize: 16),
+                    //           ),
+                    //           IconButton(
+                    //             icon: const Icon(Icons.add),
+                    //             onPressed: () {
+                    //               setState(() {
+                    //                 updatedTime += 10; // Tăng 10 giây
+                    //               });
+                    //             },
+                    //           ),
+                    //         ],
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                     // Exercise description
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),

@@ -41,6 +41,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       UserFields.goal: "",
       UserFields.calories: 0,
       UserFields.weightChangeRate: 0,
+      UserFields.surveyHistory: [],
     });
   }
 

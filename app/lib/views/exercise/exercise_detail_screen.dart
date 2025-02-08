@@ -19,7 +19,7 @@ class ExerciseDetailScreen extends StatefulWidget {
   });
 
   @override
-  _ExerciseDetailScreenState createState() => _ExerciseDetailScreenState();
+  State<ExerciseDetailScreen> createState() => _ExerciseDetailScreenState();
 }
 
 class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
@@ -49,7 +49,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
     if (widget.currentIndex == widget.exercises.length - 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bạn đã hoàn thành tất cả bài tập!')),
+        const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text('Bạn đã hoàn thành tất cả bài tập!')),
       );
       Navigator.pop(context); // Quay lại danh sách bài tập
       return;
@@ -114,11 +116,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       'user_uid': userUid,
       'name': exercise.name,
       'calo': exercise.calories * (exercise.duration - remainingTime),
-      // calculateCalories(
-      //   (widget.exercise.duration - remainingTime) * 60, // Chuyển sang giây
-      //   8, // MET giả định
-      //   70, // Cân nặng giả định
-      //),
       'duration': exercise.duration - remainingTime, // Thời gian đã tập
       'completed_at': completedDate, // Thời gian hoàn thành
       'description': exercise.description,
@@ -137,7 +134,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       saveExerciseData(
           widget.exercise, widget.exercise.duration - remainingTime);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bạn đã hoàn thành tất cả bài tập!')),
+        const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text('Bạn đã hoàn thành tất cả bài tập!')),
       );
       Navigator.pop(context); // Quay về danh sách bài tập
     } else {
@@ -203,9 +202,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         title: Text(widget.exercise.name),
         centerTitle: true,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: AppTheme.primaryGradient
-          ),
+          decoration: const BoxDecoration(gradient: AppTheme.primaryGradient),
         ),
         actions: [
           IconButton(
@@ -263,9 +260,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                                       remainingTime / widget.exercise.duration,
                                   backgroundColor: Colors.grey.shade300,
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                    isResting
-                                        ? Colors.orange
-                                        : Colors.green,
+                                    isResting ? Colors.orange : Colors.green,
                                   ),
                                   strokeWidth: 10,
                                 ),
@@ -401,7 +396,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                       if (isResting)
                         Column(
                           children: [
-                            SizedBox(height: 24),
+                            const SizedBox(height: 24),
                             SizedBox(
                               width: 300,
                               child: ElevatedButton(

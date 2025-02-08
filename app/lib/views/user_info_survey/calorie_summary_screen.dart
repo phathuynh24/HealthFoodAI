@@ -87,6 +87,50 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
                     ],
                   ),
                 ),
+
+                const SizedBox(height: 20),
+                // Time to Re-survey
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.greenAccent[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    "Bạn có thể làm lại khảo sát lại ở mục 'Cài đặt' để cập nhật mục tiêu và thể trạng của mình.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Info Summary
+                _buildSummaryItem(
+                    "Giới tính",
+                    widget.surveyData[UserFields.gender] == "Male"
+                        ? "Nam"
+                        : "Nữ"),
+                _buildSummaryItem(
+                    "Tuổi", widget.surveyData[UserFields.age].toString()),
+                _buildSummaryItem(
+                    "Chiều cao", "${widget.surveyData[UserFields.height]} cm"),
+                _buildSummaryItem("Cân nặng hiện tại",
+                    "${widget.surveyData[UserFields.weight]} kg"),
+                _buildSummaryItem("Cân nặng mục tiêu",
+                    "${widget.surveyData[UserFields.targetWeight]} kg"),
+                _buildSummaryItem("Mức độ vận động",
+                    widget.surveyData[UserFields.activityLevel]),
+                _buildSummaryItem(
+                    "Mục tiêu", widget.surveyData[UserFields.goal]),
+                if (widget.surveyData[UserFields.weightChangeRate] != null &&
+                    widget.surveyData[UserFields.goal] != "Duy trì cân nặng")
+                  _buildSummaryItem(
+                    "Mức độ ${widget.surveyData[UserFields.goal] == "Giảm cân" ? "giảm" : "tăng"} cân/tuần",
+                    "${widget.surveyData[UserFields.weightChangeRate]} kg/tuần",
+                  ),
+
                 const Spacer(),
 
                 // Save & Finish Button
@@ -201,5 +245,20 @@ class _CalorieSummaryScreenState extends State<CalorieSummaryScreen> {
         });
       }
     }
+  }
+
+  Widget _buildSummaryItem(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: const TextStyle(fontSize: 16)),
+          Text(value,
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
   }
 }

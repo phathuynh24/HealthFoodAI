@@ -1,14 +1,18 @@
+import 'package:app/widgets/custom_app_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class HistoryExercise extends StatefulWidget {
+class HistoryExerciseScreen extends StatefulWidget {
+  final DateTime? initialDate;
+  const HistoryExerciseScreen({super.key, this.initialDate});
+
   @override
-  _HistoryExerciseState createState() => _HistoryExerciseState();
+  State<HistoryExerciseScreen> createState() => _HistoryExerciseScreenState();
 }
 
-class _HistoryExerciseState extends State<HistoryExercise> {
+class _HistoryExerciseScreenState extends State<HistoryExerciseScreen> {
   DateTime? selectedDay;
   List<Map<String, dynamic>> exercises = [];
   List<Map<String, dynamic>> dailyExercises = [];
@@ -16,6 +20,7 @@ class _HistoryExerciseState extends State<HistoryExercise> {
   @override
   void initState() {
     super.initState();
+    selectedDay = widget.initialDate ?? DateTime.now();
     getExerciseData();
   }
 
@@ -44,7 +49,7 @@ class _HistoryExerciseState extends State<HistoryExercise> {
     exercises.sort((a, b) {
       final aDate = parseDate(a['completed_at']);
       final bDate = parseDate(b['completed_at']);
-      return bDate.compareTo(aDate); // Newest first
+      return bDate.compareTo(aDate);
     });
   }
 
@@ -68,21 +73,10 @@ class _HistoryExerciseState extends State<HistoryExercise> {
 
   @override
   Widget build(BuildContext context) {
+    CalendarFormat calendarFormat = CalendarFormat.month;
+
     return Scaffold(
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        title: Text('Lịch sử bài tập'),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue, Colors.lightBlue],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-          ),
-        ),
-      ),
+      appBar: const CustomAppBar(title: 'Lịch sử bài tập'),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -90,10 +84,21 @@ class _HistoryExerciseState extends State<HistoryExercise> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TableCalendar(
+                locale: 'vi_VN',
                 firstDay: DateTime.utc(2000, 1, 1),
-                lastDay: DateTime.utc(2100, 12, 31),
+                lastDay: DateTime.now(),
                 focusedDay: selectedDay ?? DateTime.now(),
                 calendarFormat: CalendarFormat.month,
+                availableCalendarFormats: const {
+                  CalendarFormat.month: 'Tháng',
+                  CalendarFormat.week: 'Tuần',
+                }, // Chỉ hiển thị các tùy chọn Tháng và Tuần
+                onFormatChanged: (format) {
+                  setState(() {
+                    calendarFormat =
+                        format; // Cập nhật định dạng lịch khi thay đổi
+                  });
+                },
                 selectedDayPredicate: (day) =>
                     selectedDay != null && isSameDay(selectedDay, day),
                 onDaySelected: (selected, focused) {
@@ -103,60 +108,57 @@ class _HistoryExerciseState extends State<HistoryExercise> {
                   filterExercisesByDay(selected);
                 },
               ),
-              SizedBox(height: 16.0),
-              Text(
+              const SizedBox(height: 16.0),
+              const Text(
                 'Bài tập trong ngày:',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               dailyExercises.isEmpty
-                  ? Center(child: Text('Không có bài tập nào trong ngày này.'))
+                  ? const Center(
+                      child: Text('Không có bài tập nào trong ngày này.'),
+                    )
                   : ListView.builder(
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: dailyExercises.length,
                       itemBuilder: (context, index) {
                         final exercise = dailyExercises[index];
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(Icons.fitness_center, size: 50),
-                              SizedBox(width: 16.0),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      exercise['name'] ?? 'Không có tên',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 8.0),
-                                    Text(
-                                      'Thời gian: ${exercise['duration']} giây',
-                                      style: TextStyle(
-                                          color: Colors.grey.shade700),
-                                    ),
-                                    Text(
-                                      'Hoàn thành: ${exercise['completed_at']}',
-                                      style: TextStyle(
-                                          color: Colors.grey.shade700),
-                                    ),
-                                  ],
+                          child: Card(
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: ListTile(
+                              leading: const Icon(Icons.fitness_center,
+                                  size: 40, color: Colors.blueAccent),
+                              title: Text(
+                                exercise['name'] ?? 'Không có tên',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Icon(
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 4.0),
+                                  Text(
+                                      'Thời gian: ${exercise['duration']} giây'),
+                                  // Text('Hoàn thành: ${exercise['completed_at']}'),
+                                ],
+                              ),
+                              trailing: const Icon(
                                 Icons.check_circle,
                                 color: Colors.green,
+                                size: 30,
                               ),
-                            ],
+                            ),
                           ),
                         );
                       },

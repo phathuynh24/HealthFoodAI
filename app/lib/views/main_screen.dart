@@ -1,4 +1,5 @@
 import "package:app/core/theme/app_colors.dart";
+import "package:app/views/exercise/exercise_screen.dart";
 import "package:app/views/food_recognition/food_scan_screen.dart";
 import "package:app/views/food_suggestions/food_suggest_screen.dart";
 import "package:app/views/home/home_screen.dart";
@@ -31,13 +32,12 @@ class MainScreen extends StatelessWidget {
         ),
         // Food Suggest Screen
         PersistentTabConfig(
-          screen: const FoodSuggestScreen(defaultCalories: 1000),
+          screen: const FoodSuggestScreen(),
           item: ItemConfig(
             icon: const Icon(Icons.restaurant_menu),
             title: "Món ăn",
             activeForegroundColor: AppColors.activeColor,
             inactiveForegroundColor: Colors.grey,
-            
           ),
         ),
         // Scan Screen
@@ -61,7 +61,7 @@ class MainScreen extends StatelessWidget {
         ),
         // Excercise Screen
         PersistentTabConfig(
-          screen: const SafeArea(child: Center(child: Text("🏋️ Thể dục"))),
+          screen: DailyWorkoutScreen(),
           item: ItemConfig(
             icon: const Icon(Icons.fitness_center),
             title: "Thể dục",
@@ -114,6 +114,8 @@ class MainScreen extends StatelessWidget {
         ),
       ),
       navBarOverlap: const NavBarOverlap.full(),
+      onTabChanged: (index) {
+      },
     );
   }
 }

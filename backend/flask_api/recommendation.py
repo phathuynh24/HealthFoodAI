@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 @recommendation.route('/recommendation/suggest-recipes', methods=['POST'])
 def suggest_and_translate_recipes():
     try:
-        # Get the input data
+        # Nhận dữ liệu từ FE
         data = request.get_json()
         if not data:
             return jsonify({"error": "No data provided"}), 400
@@ -27,52 +27,42 @@ def suggest_and_translate_recipes():
         if not user_id or not preferences or not nutrition:
             return jsonify({"error": "userId, preferences, and nutrition are required"}), 400
 
-        # Mapping FE preferences to Spoonacular API parameters
+        # Lấy thông tin preferences
         cuisine = preferences.get('cuisine', '')
-        include_ingredients = []
-        exclude_ingredients = []
-
-        # Các thành phần cố định cho từng hương vị
-        sweet_ingredients = ["sugar", "cane sugar", "honey"]
-        salty_ingredients = ["sea salt", "salt", "soy sauce"]
-        sour_ingredients = ["vinegar", "lemon", "lime"]
-        bitter_ingredients = ["dark chocolate", "coffee", "arugula"]
-        savory_ingredients = ["umami", "anchovies", "soy sauce"]
-        fatty_ingredients = ["butter", "olive oil", "cream"]
-
-        if preferences.get('sweet', False):
-            include_ingredients.append(random.choice(sweet_ingredients))
-        if preferences.get('salty', False):
-            include_ingredients.append(random.choice(salty_ingredients))
-        if preferences.get('sour', False):
-            include_ingredients.append(random.choice(sour_ingredients))
-        if preferences.get('bitter', False):
-            include_ingredients.append(random.choice(bitter_ingredients))
-        if preferences.get('savory', False):
-            include_ingredients.append(random.choice(savory_ingredients))
-        if preferences.get('fatty', False):
-            include_ingredients.append(random.choice(fatty_ingredients))
+        include_ingredients = preferences.get('ingredients', [])
+        exclude_ingredients = preferences.get('excludeIngredients', [])
 
         # Loại bỏ trùng lặp trong danh sách
         include_ingredients = list(set(include_ingredients))
 
-        # Adjust nutritional limits based on user input
-        max_calories = nutrition.get('calories', 800)
-        max_fat = nutrition.get('fat', 30)
-        max_protein = nutrition.get('protein', 50)
-        max_carbs = nutrition.get('carbs', 100)
+        # Lấy giá trị dinh dưỡng tối thiểu và tối đa từ FE
+        min_calories = nutrition.get('calories_min', 0)
+        max_calories = nutrition.get('calories_max', 200)
 
-        # Call Spoonacular API to get recipe suggestions
+        min_protein = nutrition.get('protein_min', 0)
+        max_protein = nutrition.get('protein_max', 50)
+
+        min_fat = nutrition.get('fat_min', 0)
+        max_fat = nutrition.get('fat_max', 30)
+
+        min_carbs = nutrition.get('carbs_min', 0)
+        max_carbs = nutrition.get('carbs_max', 100)
+
+        # Gọi Spoonacular API với các tham số dinh dưỡng mới
         recipes = get_recipe_suggestions(
             api_key=SPOONACULAR_API_KEY,
+            min_calories=min_calories,
             max_calories=max_calories,
-            max_fat=max_fat,
+            min_protein=min_protein,
             max_protein=max_protein,
+            min_fat=min_fat,
+            max_fat=max_fat,
+            min_carbs=min_carbs,
             max_carbs=max_carbs,
             cuisine=cuisine,
             include_ingredients=include_ingredients,
             exclude_ingredients=exclude_ingredients,
-            number=3
+            number=2
         )
 
         if not recipes:
@@ -130,28 +120,40 @@ def get_recipe_instructions(recipe_id):
         logging.error(f"Error calling Spoonacular API for recipe {recipe_id}: {e}")
         return {}
 
-def get_recipe_suggestions(api_key, max_calories, max_fat, max_protein, max_carbs,
-                           cuisine, include_ingredients, exclude_ingredients, number=10):
+def get_recipe_suggestions(api_key, 
+                           min_calories, max_calories, 
+                           min_fat, max_fat, 
+                           min_protein, max_protein, 
+                           min_carbs, max_carbs, 
+                           cuisine, include_ingredients, 
+                           exclude_ingredients, 
+                           number=1):
     url = "https://api.spoonacular.com/recipes/complexSearch"
     params = {
         "apiKey": api_key,
         "cuisine": cuisine,
-        "maxCalories": max_calories,
-        "maxFat": max_fat,
-        "maxProtein": max_protein,
-        "maxCarbs": max_carbs,
+        # "minCalories": min_calories,  # Giới hạn tối thiểu
+        "maxCalories": max_calories,  # Giới hạn tối đa
+        # "minFat": min_fat,
+        # "maxFat": max_fat,
+        # "minProtein": min_protein,
+        # "maxProtein": max_protein,
+        # "minCarbs": min_carbs,
+        # "maxCarbs": max_carbs,
         "number": number,
         "addRecipeInformation": True,
         "fillIngredients": True,
     }
 
-    if include_ingredients:
-        selected_include = random.sample(include_ingredients, min(len(include_ingredients), 2))
-        params["includeIngredients"] = ",".join(selected_include)
+    # # Xử lý thành phần cần bao gồm
+    # if include_ingredients:
+    #     selected_include = random.sample(include_ingredients, min(len(include_ingredients), 2))
+    #     params["includeIngredients"] = ",".join(selected_include)
 
-    if exclude_ingredients:
-        selected_exclude = random.sample(exclude_ingredients, min(len(exclude_ingredients), 2))
-        params["excludeIngredients"] = ",".join(selected_exclude)
+    # # Xử lý thành phần cần loại trừ
+    # if exclude_ingredients:
+    #     selected_exclude = random.sample(exclude_ingredients, min(len(exclude_ingredients), 2))
+    #     params["excludeIngredients"] = ",".join(selected_exclude)
 
     try:
         logging.info(f"Calling Spoonacular API with params: {params}")

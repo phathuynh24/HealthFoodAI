@@ -16,12 +16,14 @@ class FoodDetailScreen extends StatefulWidget {
   final MealModel meal;
   final String imageUrl;
   final bool isFavorite;
+  final bool isEditing;
 
   const FoodDetailScreen(
       {super.key,
       required this.meal,
       required this.imageUrl,
-      this.isFavorite = false});
+      this.isFavorite = false,
+      this.isEditing = false});
 
   @override
   State<FoodDetailScreen> createState() => _FoodDetailScreenState();
@@ -34,6 +36,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
   String selectedMealType = 'Buổi sáng';
   late double _serving;
   late bool isFavorite;
+  late bool isEditing;
   bool isLoggedMeal = false;
 
   @override
@@ -41,6 +44,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
     super.initState();
     isFavorite = widget.isFavorite;
     _serving = widget.meal.serving;
+    isEditing = widget.isEditing;
     _checkIfFavorite();
   }
 
@@ -70,6 +74,27 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
     });
   }
 
+  Future<void> _editMeal() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('logged_meals')
+          .doc(widget.meal.id)
+          .update({
+        'calories': widget.meal.calories * _serving,
+        'weight': widget.meal.weight * _serving,
+        'serving': _serving,
+      });
+
+      // Thông báo thành công
+      CustomSnackbar.show(context, "Đã cập nhật món ăn!", isSuccess: true);
+
+      // Quay lại và trả dữ liệu cập nhật để màn hình trước load lại dữ liệu
+      Navigator.pop(context, true);
+    } catch (e) {
+      CustomSnackbar.show(context, "Lỗi khi cập nhật: $e", isSuccess: false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -91,7 +116,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const MainScreen()),
+                  MaterialPageRoute(builder: (context) => MainScreen()),
                   (route) =>
                       false, // Remove all routes in the stack, except Home Screen
                 );
@@ -120,7 +145,6 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                       borderRadius: BorderRadius.circular(12)),
                 ),
               ),
-        
               const SizedBox(width: 16.0),
             ],
           ),
@@ -211,7 +235,8 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                       ),
                       Container(
                         padding: const EdgeInsets.all(8),
-                        child: _buildIngredients(widget.meal.ingredients, _serving),
+                        child: _buildIngredients(
+                            widget.meal.ingredients, _serving),
                       ),
                       Container(
                         padding: const EdgeInsets.all(8),
@@ -247,8 +272,8 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                             ),
                             const SizedBox(height: 4),
                             ...widget.meal.nutrients.map(
-                              (nutrient) =>
-                                  _buildNutrientRow(nutrient.name, nutrient.amount),
+                              (nutrient) => _buildNutrientRow(
+                                  nutrient.name, nutrient.amount),
                             ),
                           ],
                         ),
@@ -268,11 +293,13 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                   totalWeight: widget.meal.weight,
                 ),
                 const SizedBox(height: 16),
-        
+
                 /// Serving quantity selection
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -299,7 +326,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-        
+
                       /// Controls for increasing/decreasing serving
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -310,7 +337,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                                 color: Colors.red, size: 28),
                             onPressed: () => _updateServing(false),
                           ),
-        
+
                           /// Serving value display
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -318,7 +345,8 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                             decoration: BoxDecoration(
                               color: Colors.green[50],
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.green, width: 1.5),
+                              border:
+                                  Border.all(color: Colors.green, width: 1.5),
                             ),
                             child: Text(
                               _formatServingValue(_serving),
@@ -329,7 +357,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                               ),
                             ),
                           ),
-        
+
                           /// Increase button
                           IconButton(
                             icon: const Icon(Icons.add_circle,
@@ -341,102 +369,93 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                     ],
                   ),
                 ),
-        
+
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     /// Retry Button
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const FoodScanScreen()),
-                            (route) => false,
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.black54,
-                          backgroundColor: Colors.lightBlue[100],
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        child: const Text(
-                          "Thử lại",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,
+                    if (!isEditing)
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const FoodScanScreen()),
+                              (route) => false,
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.black54,
+                            backgroundColor: Colors.lightBlue[100],
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: const Text(
+                            "Thử lại",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-        
-                    const SizedBox(width: 16),
-        
+
+                    if (!isEditing) const SizedBox(width: 16),
+
                     /// Save to History Button
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () async {
-                          // Hiển thị Dialog để chọn buổi ăn trước khi tiếp tục
-                          final selectedMeal = await showDialog<String>(
-                            context: context,
-                            builder: (context) =>
-                                _buildMealSelectionDialog(context),
-                          );
-        
-                          // Nếu người dùng không chọn gì thì dừng lại
-                          if (selectedMeal == null || selectedMeal.isEmpty) return;
-        
-                          setState(() {
-                            isLoggedMeal = true;
-                          });
-        
-                          // Kiểm tra widget còn tồn tại trước khi tiếp tục
-                          if (!context.mounted) return;
-        
-                          String? successMessage;
-                          String? errorMessage;
-        
-                          try {
-                            await saveMealData(
-                              context,
-                              widget.meal,
-                              widget.imageUrl,
-                              _serving,
-                              selectedMeal,
-                              false, // isFavorite = false -> log meal
-                              "", // Log meal without custom name
+                          if (isEditing) {
+                            await _editMeal(); // Gọi hàm chỉnh sửa
+                          } else {
+                            final selectedMeal = await showDialog<String>(
+                              context: context,
+                              builder: (context) =>
+                                  _buildMealSelectionDialog(context),
                             );
-                            successMessage = 'Món ăn đã được lưu!';
-                          } catch (e) {
-                            errorMessage = 'Lỗi khi lưu: $e';
-                          } finally {
+
+                            if (selectedMeal == null || selectedMeal.isEmpty)
+                              return;
+
                             setState(() {
-                              isLoggedMeal = false;
+                              isLoggedMeal = true;
                             });
-                          }
-        
-                          // Kiểm tra lại nếu widget còn tồn tại trước khi hiển thị Snackbar
-                          if (!context.mounted) return;
-        
-                          if (successMessage != null) {
-                            CustomSnackbar.show(context, successMessage,
-                                isSuccess: true);
-                          } else if (errorMessage != null) {
-                            CustomSnackbar.show(context, errorMessage,
-                                isSuccess: false);
+
+                            try {
+                              await saveMealData(
+                                context,
+                                widget.meal,
+                                widget.imageUrl,
+                                _serving,
+                                selectedMeal,
+                                false,
+                                "",
+                              );
+                              CustomSnackbar.show(
+                                  context, 'Món ăn đã được lưu!',
+                                  isSuccess: true);
+                            } catch (e) {
+                              CustomSnackbar.show(context, 'Lỗi khi lưu: $e',
+                                  isSuccess: false);
+                            } finally {
+                              setState(() {
+                                isLoggedMeal = false;
+                              });
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: Colors.yellow[700],
+                          backgroundColor:
+                              isEditing ? Colors.green : Colors.yellow[700],
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: const Text(
-                          "Thêm vào lịch sử",
-                          style: TextStyle(
+                        child: Text(
+                          isEditing ? "Lưu thay đổi" : "Thêm vào lịch sử",
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
@@ -452,11 +471,11 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
         ),
         if (isLoggedMeal)
           Container(
-              color: Colors.black.withOpacity(0.3),
-              child: const Center(
-                child: LoadingIndicator(),
-              ),
+            color: Colors.black.withOpacity(0.3),
+            child: const Center(
+              child: LoadingIndicator(),
             ),
+          ),
       ],
     );
   }
@@ -568,8 +587,8 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                       setState(() {
                         isFavorite = true;
                       });
-                      CustomSnackbar.show(context,
-                          'Món ăn đã được thêm vào danh sách yêu thích!',
+                      CustomSnackbar.show(
+                          context, 'Món ăn đã được lưu vào danh sách',
                           isSuccess: true);
                     } else if (errorMessage != null) {
                       CustomSnackbar.show(context, errorMessage,
@@ -633,6 +652,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
 
       // Create data for meal
       Map<String, dynamic> mealData = {
+        'id': docId,
         'customName': isFavorite ? customName : meal.name,
         'originalName': meal.name,
         'calories': meal.calories,
@@ -681,7 +701,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
       if (!isFavorite) {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
+          MaterialPageRoute(builder: (context) => MainScreen()),
           (route) => false, // Xóa toàn bộ lịch sử điều hướng
         );
       }
@@ -720,14 +740,12 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
       setState(() {
         isFavorite = false;
       });
-
-      CustomSnackbar.show(
-          context, 'Món ăn đã được xoá khỏi danh sách yêu thích!',
+      CustomSnackbar.show(context, 'Món ăn đã được xoá khỏi danh sách!',
           isSuccess: true);
     } catch (e) {
       // Show error message
       CustomSnackbar.show(
-          context, 'Đã xảy ra lỗi khi xoá món ăn khỏi danh sách yêu thích!',
+          context, 'Đã xảy ra lỗi khi xoá món ăn khỏi danh sách!',
           isSuccess: false);
     }
   }

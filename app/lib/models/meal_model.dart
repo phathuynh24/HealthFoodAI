@@ -1,6 +1,7 @@
 import 'package:app/core/firebase/firebase_constants.dart';
 
 class MealModel {
+  final String id;
   final String name;
   final double weight;
   final double calories;
@@ -16,6 +17,7 @@ class MealModel {
   final double serving;
 
   MealModel({
+    required this.id,
     required this.name,
     required this.weight,
     required this.calories,
@@ -35,6 +37,7 @@ class MealModel {
   factory MealModel.fromMap(Map<String, dynamic>? map) {
     if (map == null) {
       return MealModel(
+        id: '',
         name: 'Unknown',
         weight: 0,
         calories: 0,
@@ -52,6 +55,7 @@ class MealModel {
     }
 
     return MealModel(
+      id: map[MealFields.id] ?? '',
       name: (map[MealFields.customName] as String?)?.isNotEmpty == true
           ? map[MealFields.customName]
           : map[MealFields.originalName] ?? 'Unnamed Meal',
@@ -80,6 +84,7 @@ class MealModel {
 
   MealModel copyWith({List<IngredientModel>? newIngredients}) {
     return MealModel(
+      id: id,
       name: name,
       weight: weight,
       calories: calories,

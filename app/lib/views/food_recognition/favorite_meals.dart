@@ -31,7 +31,7 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
         .delete();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-          content: Text("Đã xoá món ăn khỏi danh sách yêu thích!",
+          content: Text("Đã xoá món ăn khỏi danh sách!",
               style: TextStyle(color: Colors.white)),
           backgroundColor: Colors.redAccent),
     );
@@ -97,7 +97,7 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
         title: Column(
           children: [
             const Text(
-              'Danh sách món ăn yêu thích',
+              'Danh sách món ăn đã lưu',
               style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
@@ -197,7 +197,7 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
                 children: [
                   Icon(Icons.favorite_border, size: 80, color: Colors.grey),
                   SizedBox(height: 10),
-                  Text("Chưa có món ăn yêu thích nào!", style: TextStyle(fontSize: 18, color: Colors.grey)),
+                  Text("Chưa có món ăn nào được lưu!", style: TextStyle(fontSize: 18, color: Colors.grey)),
                 ],
               ),
             );
@@ -264,6 +264,7 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
                       MaterialPageRoute(
                         builder: (context) => FoodDetailScreen(
                           meal: MealModel(
+                            id: docId,
                             name: name,
                             calories: calories,
                             weight: weight,

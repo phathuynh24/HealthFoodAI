@@ -1,4 +1,5 @@
 import 'package:app/models/exercise_model.dart';
+import 'package:app/views/exercise/exercise_detail_screen.dart';
 import 'package:app/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -319,7 +320,7 @@ class ExerciseListScreen extends StatelessWidget {
         .where((exercise) => exercise.types.contains(filterType))
         .toList();
     return Scaffold(
-      appBar: CustomAppBar(title: "Exercise List"),
+      appBar: const CustomAppBar(title: "Danh sách bài tập"),
       body: ListView.builder(
         itemCount: filteredExercises.length,
         itemBuilder: (context, index) {
@@ -345,7 +346,16 @@ class ExerciseListScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 14),
               ),
               onPressed: () {
-                
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ExerciseDetailScreen(
+                      exercise: exercise,
+                      exercises: filteredExercises,
+                      currentIndex: index,
+                    ),
+                  ),
+                );
               },
             ),
           );

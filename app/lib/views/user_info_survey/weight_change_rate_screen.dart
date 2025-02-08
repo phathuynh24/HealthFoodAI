@@ -1,4 +1,6 @@
 import 'package:app/core/calorie_calculator/calorie_calculator.dart';
+import 'package:app/core/events/calo_update_event.dart';
+import 'package:app/core/events/event_bus.dart';
 import 'package:app/core/firebase/firebase_constants.dart';
 import 'package:app/views/user_info_survey/activity_selection_screen.dart';
 import 'package:app/widgets/custom_app_bar.dart';
