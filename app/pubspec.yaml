@@ -38,10 +38,10 @@ flutter:
     - assets/forgot_password.png
     - assets/camera_scan.png
     - assets/healthy_tip_1.png
-    - assets/healthy_tip_2.png
     - assets/dish_icon.png
     - assets/empty_glass.png
     - assets/glass.png
+
     - assets/plank.gif
     - assets/planking.gif
     - assets/airbike.gif

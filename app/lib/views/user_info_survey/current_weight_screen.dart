@@ -33,6 +33,7 @@ class _CurrentWeightScreenState extends State<CurrentWeightScreen> {
 
     if (widget.surveyData[UserFields.goal] == "Duy trì cân nặng") {
       updatedSurveyData[UserFields.targetWeight] = weight;
+      updatedSurveyData[UserFields.weightChangeRate] = 0.0;
       Navigator.push(
         context,
         MaterialPageRoute(

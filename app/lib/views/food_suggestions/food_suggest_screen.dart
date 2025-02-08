@@ -770,8 +770,7 @@ class _FoodSuggestScreenState extends State<FoodSuggestScreen>
                                 style: TextStyle(fontSize: 14),
                               ),
                         onTap: () => {
-                          Navigator.push(
-                            context,
+                          Navigator.of(context, rootNavigator: true).push(
                             MaterialPageRoute(
                               builder: (context) =>
                                   FoodInfoScreen(recipe: recipe),

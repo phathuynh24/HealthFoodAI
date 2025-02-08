@@ -152,7 +152,6 @@ class _AddWeightScreenState extends State<AddWeightScreen> {
       'weight': weight,
       'calories': calories,
       'updatedAt': Timestamp.now(),
-      if (!isMaintaining) 'targetWeight': 0.0,
     };
 
     debugPrint('isMaintaining: $isMaintaining');
